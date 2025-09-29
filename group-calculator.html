@@ -102,22 +102,35 @@
             </div>
         </div>
 
-        <!-- Default Odds Section -->
+        <!-- Global Defaults Section -->
         <div class="mb-8 bg-emerald-50 p-4 rounded-lg border border-emerald-200">
-            <h2 class="text-lg font-semibold text-gray-700 mb-3">Quick Setup</h2>
-            <div class="flex gap-4 items-end">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3">Global Defaults</h2>
+            <div class="grid md:grid-cols-4 gap-4 items-end">
                 <div class="flex-1">
                     <label for="default_odds_group" class="block text-sm font-medium text-gray-700 mb-1">Default Odds (Copy to All Teams)</label>
                     <input type="number" id="default_odds_group" value="1.50" min="1.01" step="0.01"
                            class="w-full px-3 py-2 border border-emerald-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                            placeholder="e.g., 2.00">
                 </div>
-                <button onclick="copyDefaultOddsToAll()" 
-                        class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition">
-                    Copy to All Teams
-                </button>
+                <div>
+                    <label for="global_teams_per_group" class="block text-sm font-medium text-gray-700 mb-1">Teams Per Group (All)</label>
+                    <select id="global_teams_per_group" onchange="setAllTeamsPerGroup()" class="w-full px-3 py-2 border border-emerald-300 rounded-lg">
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button onclick="copyDefaultOddsToAll()" 
+                            class="w-full px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition">Copy Odds to All</button>
+                    <button onclick="regenerateAllGroupsUI()" 
+                            class="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition">Refresh Groups</button>
+                </div>
+                <div class="text-xs text-emerald-700 leading-snug">
+                    <p><span class="font-semibold">How it works:</span></p>
+                    <p>Changing Teams Per Group instantly updates every group (resets its sizes + odds + wins).</p>
+                    <p>Use Copy Odds after changing the default odds field.</p>
+                </div>
             </div>
-            <p class="text-xs text-emerald-600 mt-2">Enter odds here and click the button to set the same odds for all teams across all groups.</p>
         </div>
 
         <!-- Groups Section -->
@@ -159,6 +172,7 @@
     <script>
     let numGroups = 3;
     let groupsData = [];
+    let globalTeamsPerGroup = 3; // central default
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -173,10 +187,10 @@
             groupsData = [];
             for (let i = 0; i < numGroups; i++) {
                 groupsData.push({
-                    teams: 3,
+                    teams: globalTeamsPerGroup,
                     allowedSizes: [2],
-                    odds: [1.5, 1.5, 1.5],
-                    wins: [true, true, true]
+                    odds: Array(globalTeamsPerGroup).fill(1.5),
+                    wins: Array(globalTeamsPerGroup).fill(true)
                 });
             }
             
@@ -269,6 +283,26 @@
                 container.appendChild(teamDiv);
             }
             
+            calculateProfit();
+        }
+
+        function setAllTeamsPerGroup() {
+            const sel = document.getElementById('global_teams_per_group');
+            const val = parseInt(sel.value);
+            if (val === globalTeamsPerGroup) return;
+            globalTeamsPerGroup = val;
+            // Rebuild groupsData with new team count preserving number of groups
+            for (let i = 0; i < groupsData.length; i++) {
+                groupsData[i].teams = val;
+                groupsData[i].odds = Array(val).fill(1.5);
+                groupsData[i].wins = Array(val).fill(true);
+                groupsData[i].allowedSizes = [Math.min(2, val)];
+            }
+            regenerateAllGroupsUI();
+        }
+
+        function regenerateAllGroupsUI() {
+            generateGroupsUI();
             calculateProfit();
         }
 

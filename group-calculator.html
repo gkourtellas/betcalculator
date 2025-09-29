@@ -6,6 +6,10 @@
     <title>Group System Betting Calculator v2.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Additional styles for group system types */
+        .group-system-types {
+            margin-top: 1rem;
+        }
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
             font-family: 'Inter', sans-serif;
@@ -60,6 +64,7 @@
                     Group System Betting Calculator
                 </h1>
                 <p class="text-sm text-gray-500 mt-1">Version 2.4</p>
+                    <p class="text-sm text-gray-500 mt-1">Version 2.5</p>
             </div>
             <div class="flex gap-3">
                 <button onclick="calculateProfit()" 
@@ -76,6 +81,11 @@
         <div class="mb-8">
             <h2 class="text-xl font-semibold text-gray-700 mb-4">Configuration</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="group-system-types">
+                            <h3 class="text-sm font-semibold text-gray-700 mb-2">Group System Types (Optional)</h3>
+                            <p class="text-xs text-gray-500 mb-3">Select combinations of successful groups to include (e.g. Doubles + Trebles). If none selected, legacy "Groups Needed" logic is used.</p>
+                            <div id="group_system_types" class="flex flex-wrap gap-3"></div>
+                        </div>
                 <div>
                     <label for="num_groups" class="block text-sm font-medium text-gray-700 mb-2">Number of Groups</label>
                     <select id="num_groups" onchange="updateConfiguration()" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
@@ -166,6 +176,8 @@
         function updateConfiguration() {
             numGroups = parseInt(document.getElementById('num_groups').value);
             
+            buildGroupSystemTypeOptions();
+
             // Update groups required dropdown
             const groupsRequiredSelect = document.getElementById('groups_required');
             groupsRequiredSelect.innerHTML = '';
@@ -335,6 +347,8 @@
         function calculateProfit() {
             const stake = parseFloat(document.getElementById('unit_stake').value) || 0;
             const groupsRequired = parseInt(document.getElementById('groups_required').value);
+            const selectedGroupSizeElems = Array.from(document.querySelectorAll('.group-size-checkbox:checked'));
+            const selectedGroupSizes = selectedGroupSizeElems.map(el => parseInt(el.value)).sort((a,b)=>a-b);
 
             // If no stake, reset view
             if (stake <= 0) {
@@ -404,15 +418,13 @@
             profitEl.textContent = `$${netProfit.toFixed(2)}`;
             profitEl.className = netProfit >= 0 ? 'text-2xl font-bold text-green-600' : 'text-2xl font-bold text-red-600';
 
-            // Breakdown text
+            // Revised breakdown reflects new per-group + system types (if present)
             let breakdown = '';
-            breakdown += `Groups Required: ${groupsRequired} | Successful: ${successfulGroups}/${numGroups}\n`;
-            breakdown += `Total Bets (theoretical): ${totalBets.toLocaleString()}  Stake: $${totalStake.toFixed(2)}\n`;
-            breakdown += `Per-Group Returns (only winning combos of size required) ->\n`;
+            breakdown += `Successful Groups: ${successfulGroups}/${numGroups}\n`;
+            breakdown += `Total Bets: ${totalBets.toLocaleString()}  Total Stake: $${totalStake.toFixed(2)}\n`;
+            breakdown += `Total Returns: $${totalReturns.toFixed(2)}  Net: $${netProfit.toFixed(2)}\n\n`;
+            breakdown += `Group Detail (required-size winning combos only):\n`;
             breakdown += breakdownLines.join('\n');
-            breakdown += `\n\nTotal Returns: $${totalReturns.toFixed(2)}  Net: $${netProfit.toFixed(2)}`;
-            if (successfulGroups < groupsRequired) breakdown += `\n(Not enough groups met requirement – returns = $0.00)`;
-
             document.getElementById('breakdown_content').textContent = breakdown;
         }
 

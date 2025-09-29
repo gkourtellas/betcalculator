@@ -59,7 +59,7 @@
                 <h1 class="text-3xl font-extrabold text-gray-800">
                     Group System Betting Calculator
                 </h1>
-                <p class="text-sm text-gray-500 mt-1">Version 2.3</p>
+                <p class="text-sm text-gray-500 mt-1">Version 2.4</p>
             </div>
             <div class="flex gap-3">
                 <button onclick="calculateProfit()" 
@@ -336,6 +336,7 @@
             const stake = parseFloat(document.getElementById('unit_stake').value) || 0;
             const groupsRequired = parseInt(document.getElementById('groups_required').value);
 
+            // If no stake, reset view
             if (stake <= 0) {
                 document.getElementById('total_bets').textContent = '0';
                 document.getElementById('total_stake').textContent = '$0.00';
@@ -345,88 +346,74 @@
                 return;
             }
 
-            // Calculate individual bets per group
-            let groupBets = [];
-            for (let i = 0; i < numGroups; i++) {
-                const group = groupsData[i];
-                let bets = 0;
-                for (let r = group.required; r <= group.teams; r++) {
-                    bets += nCr(group.teams, r);
-                }
-                groupBets.push(bets);
-            }
-
-            // Total bets = product of all group bets
+            // PRE-CALC: theoretical total bets (original logic for now)
             let totalBets = 1;
-            for (let bets of groupBets) {
-                totalBets *= bets;
+            for (let i = 0; i < numGroups; i++) {
+                const g = groupsData[i];
+                let betsForGroup = 0;
+                for (let r = g.required; r <= g.teams; r++) betsForGroup += nCr(g.teams, r);
+                totalBets *= betsForGroup;
             }
-
             const totalStake = stake * totalBets;
 
-            // Calculate returns based on CURRENT win/loss toggles
-            let totalReturns = 0;
             let successfulGroups = 0;
-            let breakdownDetails = [];
+            let groupReturns = []; // per-group return (money) using only WIN info
+            let breakdownLines = [];
 
-            for (let groupIndex = 0; groupIndex < numGroups; groupIndex++) {
-                const group = groupsData[groupIndex];
-                const winningTeams = group.wins.filter(win => win).length;
+            for (let gi = 0; gi < numGroups; gi++) {
+                const group = groupsData[gi];
+                const winnersIdx = group.wins.map((w, idx) => w ? idx : null).filter(v => v !== null);
+                const winnersCount = winnersIdx.length;
+                const needed = group.required;
 
-                if (winningTeams >= group.required) {
-                    // This group succeeds - calculate its contribution
-                    successfulGroups++;
-
-                    // Find the best combination of required winners
-                    const winnerIndices = [];
-                    group.wins.forEach((win, idx) => {
-                        if (win) winnerIndices.push(idx);
-                    });
-
-                    // Take the first 'required' number of winners (simplified approach)
-                    const selectedWinners = winnerIndices.slice(0, group.required);
-
-                    // Calculate return for this combination
-                    let groupReturn = 1;
-                    selectedWinners.forEach(teamIdx => {
-                        groupReturn *= group.odds[teamIdx];
-                    });
-
-                    totalReturns += groupReturn * stake;
-                    breakdownDetails.push(`Group ${String.fromCharCode(65 + groupIndex)}: $${(groupReturn * stake).toFixed(2)} (${selectedWinners.length} winners)`);
-                } else {
-                    breakdownDetails.push(`Group ${String.fromCharCode(65 + groupIndex)}: $0.00 (only ${winningTeams}/${group.required} winners)`);
+                if (winnersCount < needed) {
+                    groupReturns.push(0);
+                    breakdownLines.push(`Group ${String.fromCharCode(65 + gi)}: FAIL (${winnersCount}/${needed}) Return $0.00`);
+                    continue;
                 }
+
+                successfulGroups++;
+                // Sum of ALL combinations of size = needed, comprised only of winners
+                const winnerCombos = getCombinations(winnersIdx, needed);
+                let sumProducts = 0;
+                winnerCombos.forEach(combo => {
+                    let prod = 1;
+                    combo.forEach(idx => prod *= group.odds[idx]);
+                    sumProducts += prod;
+                });
+
+                const groupReturnMoney = sumProducts * stake; // money contributed by this group
+                groupReturns.push(groupReturnMoney);
+                breakdownLines.push(`Group ${String.fromCharCode(65 + gi)}: OK (${winnersCount}/${needed}) Combos ${winnerCombos.length} Return $${groupReturnMoney.toFixed(2)}`);
             }
 
-            // Only pay out if enough groups are successful
-            if (successfulGroups < groupsRequired) {
-                totalReturns = 0;
+            // If not enough successful groups, zero everything
+            let totalReturns = 0;
+            if (successfulGroups >= groupsRequired) {
+                // For now total = sum of per-group returns (simpler & transparent)
+                totalReturns = groupReturns.reduce((a, b) => a + b, 0);
             }
 
             const netProfit = totalReturns - totalStake;
 
-            // Update display
+            // Update headline figures
             document.getElementById('total_bets').textContent = totalBets.toLocaleString();
             document.getElementById('total_stake').textContent = `$${totalStake.toFixed(2)}`;
             document.getElementById('total_returns').textContent = `$${totalReturns.toFixed(2)}`;
+            const profitEl = document.getElementById('net_profit');
+            profitEl.textContent = `$${netProfit.toFixed(2)}`;
+            profitEl.className = netProfit >= 0 ? 'text-2xl font-bold text-green-600' : 'text-2xl font-bold text-red-600';
 
-            const profitElement = document.getElementById('net_profit');
-            profitElement.textContent = `$${netProfit.toFixed(2)}`;
-            profitElement.className = netProfit >= 0 ? 'text-2xl font-bold text-green-600' : 'text-2xl font-bold text-red-600';
+            // Breakdown text
+            let breakdown = '';
+            breakdown += `Groups Required: ${groupsRequired} | Successful: ${successfulGroups}/${numGroups}\n`;
+            breakdown += `Total Bets (theoretical): ${totalBets.toLocaleString()}  Stake: $${totalStake.toFixed(2)}\n`;
+            breakdown += `Per-Group Returns (only winning combos of size required) ->\n`;
+            breakdown += breakdownLines.join('\n');
+            breakdown += `\n\nTotal Returns: $${totalReturns.toFixed(2)}  Net: $${netProfit.toFixed(2)}`;
+            if (successfulGroups < groupsRequired) breakdown += `\n(Not enough groups met requirement – returns = $0.00)`;
 
-            // Update breakdown
-            let breakdownText = `Total Groups: ${numGroups}, Groups Required: ${groupsRequired}\n`;
-            breakdownText += `Total Bets: ${totalBets.toLocaleString()}\n`;
-            breakdownText += `Successful Groups: ${successfulGroups}/${numGroups}\n`;
-            breakdownText += `Total Returns: $${totalReturns.toFixed(2)}\n`;
-            breakdownText += `Net Profit: $${netProfit.toFixed(2)}\n\n`;
-            breakdownText += `Group Breakdown:\n`;
-            breakdownDetails.forEach(detail => {
-                breakdownText += `${detail}\n`;
-            });
-
-            document.getElementById('breakdown_content').textContent = breakdownText;
+            document.getElementById('breakdown_content').textContent = breakdown;
         }
 
         // Function to copy default odds to all teams across all groups

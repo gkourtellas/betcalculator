@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom System Bet Calculator v2.0 - Create Your Own Combinations</title>
+    <title>Custom System Bet Calculator v2.1 - Create Your Own Combinations</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Use Inter font -->
@@ -13,31 +13,41 @@
             font-family: 'Inter', sans-serif;
             background-color: #f7f7f9;
         }
-        /* Custom toggle switch styles */
+        /* Custom toggle switch styles - FORCE OVERRIDE */
         .toggle-switch .slider {
-            background-color: #ef4444; /* red-500 for LOSS */
-            border: 2px solid #dc2626; /* red-600 border */
+            background-color: #ef4444 !important; /* red-500 for LOSS */
+            border: 2px solid #dc2626 !important; /* red-600 border */
         }
         .toggle-switch input:checked + .slider {
-            background-color: #10b981; /* emerald-500 for WIN */
-            border: 2px solid #059669; /* emerald-600 border */
+            background-color: #10b981 !important; /* emerald-500 for WIN */
+            border: 2px solid #059669 !important; /* emerald-600 border */
         }
         .toggle-switch input:checked + .slider::before {
-            transform: translateX(1.5rem);
+            transform: translateX(1.5rem) !important;
         }
         .toggle-switch .slider::before {
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            background-color: white !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
         }
         
-        /* WIN/LOSS label styles */
-        .text-green-600 {
+        /* WIN/LOSS label styles - FORCE COLORS */
+        .text-green-600, span.text-green-600 {
             color: #059669 !important;
             font-weight: 700 !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
         }
-        .text-red-600 {
+        .text-red-600, span.text-red-600 {
             color: #dc2626 !important;
             font-weight: 700 !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+        }
+        
+        /* Make sure button colors work */
+        .bg-blue-500 {
+            background-color: #3b82f6 !important;
+        }
+        .bg-green-500 {
+            background-color: #10b981 !important;
         }
         .bet-type-label {
             cursor: pointer;
@@ -95,7 +105,7 @@
                 <h1 class="text-3xl font-extrabold text-gray-800">
                     Multi-Bet Profit Calculator
                 </h1>
-                <p class="text-sm text-gray-500 mt-1">Version 2.0</p>
+                <p class="text-sm text-gray-500 mt-1">Version 2.1</p>
             </div>
             <div class="flex gap-3">
                 <button onclick="calculateProfit()" 

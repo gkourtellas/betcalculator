@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Bet Calculator - Trixie, Patent, Yankee, Lucky 15 & More</title>
+    <title>Custom System Bet Calculator - Create Your Own Combinations</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Use Inter font -->
@@ -75,88 +75,51 @@
             Multi-Bet Profit Calculator
         </h1>
 
-        <!-- Bet Type Selection -->
+        <!-- Team Selection -->
         <div class="mb-8">
-            <h2 class="text-xl font-semibold text-gray-700 mb-3">Select Bet Type</h2>
-            
-            <!-- 3-Selection Bets -->
+            <h2 class="text-xl font-semibold text-gray-700 mb-3">Number of Teams</h2>
             <div class="mb-4">
-                <h3 class="text-sm font-medium text-gray-600 mb-2">3-Selection Bets</h3>
-                <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-lg shadow-inner">
-                    <input type="radio" id="trixie" name="bet_type" value="trixie" checked class="hidden bet-type-input" onchange="calculateProfit()">
-                    <label for="trixie" class="bet-type-label text-center py-2 text-gray-700 font-semibold bg-white shadow-md text-sm">
-                        Trixie (4 Bets)
-                    </label>
-
-                    <input type="radio" id="patent" name="bet_type" value="patent" class="hidden bet-type-input" onchange="calculateProfit()">
-                    <label for="patent" class="bet-type-label text-center py-2 text-gray-700 font-semibold bg-white shadow-md text-sm">
-                        Patent (7 Bets)
-                    </label>
-                </div>
-            </div>
-
-            <!-- 4-Selection Bets -->
-            <div class="mb-4" id="four_selection_section" style="display: none;">
-                <h3 class="text-sm font-medium text-gray-600 mb-2">4-Selection Bets</h3>
-                <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-lg shadow-inner">
-                    <input type="radio" id="yankee" name="bet_type" value="yankee" class="hidden bet-type-input" onchange="calculateProfit()">
-                    <label for="yankee" class="bet-type-label text-center py-2 text-gray-700 font-semibold bg-white shadow-md text-sm">
-                        Yankee (11 Bets)
-                    </label>
-
-                    <input type="radio" id="lucky15" name="bet_type" value="lucky15" class="hidden bet-type-input" onchange="calculateProfit()">
-                    <label for="lucky15" class="bet-type-label text-center py-2 text-gray-700 font-semibold bg-white shadow-md text-sm">
-                        Lucky 15 (15 Bets)
-                    </label>
-                </div>
-            </div>
-
-            <!-- 5-Selection Bets -->
-            <div class="mb-4" id="five_selection_section" style="display: none;">
-                <h3 class="text-sm font-medium text-gray-600 mb-2">5-Selection Bets</h3>
-                <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-lg shadow-inner">
-                    <input type="radio" id="canadian" name="bet_type" value="canadian" class="hidden bet-type-input" onchange="calculateProfit()">
-                    <label for="canadian" class="bet-type-label text-center py-2 text-gray-700 font-semibold bg-white shadow-md text-sm">
-                        Canadian (26 Bets)
-                    </label>
-
-                    <input type="radio" id="lucky31" name="bet_type" value="lucky31" class="hidden bet-type-input" onchange="calculateProfit()">
-                    <label for="lucky31" class="bet-type-label text-center py-2 text-gray-700 font-semibold bg-white shadow-md text-sm">
-                        Lucky 31 (31 Bets)
-                    </label>
-                </div>
-            </div>
-
-            <!-- 6-Selection Bets -->
-            <div class="mb-4" id="six_selection_section" style="display: none;">
-                <h3 class="text-sm font-medium text-gray-600 mb-2">6-Selection Bets</h3>
-                <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-lg shadow-inner">
-                    <input type="radio" id="heinz" name="bet_type" value="heinz" class="hidden bet-type-input" onchange="calculateProfit()">
-                    <label for="heinz" class="bet-type-label text-center py-2 text-gray-700 font-semibold bg-white shadow-md text-sm">
-                        Heinz (57 Bets)
-                    </label>
-
-                    <input type="radio" id="lucky63" name="bet_type" value="lucky63" class="hidden bet-type-input" onchange="calculateProfit()">
-                    <label for="lucky63" class="bet-type-label text-center py-2 text-gray-700 font-semibold bg-white shadow-md text-sm">
-                        Lucky 63 (63 Bets)
-                    </label>
-                </div>
-            </div>
-
-            <!-- Selection Count Controls -->
-            <div class="mb-4">
-                <label for="selection_count" class="block text-sm font-medium text-gray-700 mb-2">Number of Selections</label>
-                <select id="selection_count" onchange="updateSelectionCount()" class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
-                    <option value="3" selected>3 Selections</option>
-                    <option value="4">4 Selections</option>
-                    <option value="5">5 Selections</option>
-                    <option value="6">6 Selections</option>
+                <select id="team_count" onchange="updateTeamCount()" class="px-4 py-3 border border-gray-300 rounded-lg text-lg shadow-sm w-full max-w-xs">
+                    <option value="3" selected>3 Teams</option>
+                    <option value="4">4 Teams</option>
+                    <option value="5">5 Teams</option>
+                    <option value="6">6 Teams</option>
+                    <option value="7">7 Teams</option>
+                    <option value="8">8 Teams</option>
                 </select>
             </div>
+        </div>
 
-            <p class="text-sm text-gray-500 mt-2" id="bet_type_description">
-                Trixie: 3 Doubles, 1 Treble. Minimum 2 winners required for a return.
-            </p>
+        <!-- Custom System Selection -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold text-gray-700 mb-3">Select Your System</h2>
+            <p class="text-sm text-gray-600 mb-4">Choose which combination sizes you want to include in your bet:</p>
+            
+            <div id="system_checkboxes" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                <!-- Checkboxes will be populated by JavaScript -->
+            </div>
+            
+            <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="font-medium text-blue-800">Total Bets:</span>
+                    <span id="total_bets_preview" class="font-bold text-blue-900">0</span>
+                </div>
+                <div class="flex justify-between items-center text-sm mt-1">
+                    <span class="font-medium text-blue-800">Total Stake:</span>
+                    <span id="total_stake_preview" class="font-bold text-blue-900">$0.00</span>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Quick Presets:</h3>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="selectPreset('singles')" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-medium transition">Singles Only</button>
+                    <button onclick="selectPreset('doubles')" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-medium transition">Doubles Only</button>
+                    <button onclick="selectPreset('trebles')" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-medium transition">Trebles Only</button>
+                    <button onclick="selectPreset('all')" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition">All Combinations</button>
+                    <button onclick="selectPreset('patent')" class="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition">Patent Style</button>
+                </div>
+            </div>
         </div>
 
 
@@ -260,10 +223,43 @@
                             </label>
                         </div>
                     </div>
+
+                    <!-- Selection G -->
+                    <div class="grid grid-cols-3 gap-4 items-center" id="selection_g" style="display: none;">
+                        <span class="font-medium text-gray-700">G</span>
+                        <input type="number" id="odds_7" value="1.80" min="1.01" step="0.01" oninput="calculateProfit()"
+                               class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
+                        <div class="flex justify-center">
+                            <label class="toggle-switch relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="win_7" checked onchange="calculateProfit()" class="sr-only">
+                                <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Selection H -->
+                    <div class="grid grid-cols-3 gap-4 items-center" id="selection_h" style="display: none;">
+                        <span class="font-medium text-gray-700">H</span>
+                        <input type="number" id="odds_8" value="2.10" min="1.01" step="0.01" oninput="calculateProfit()"
+                               class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
+                        <div class="flex justify-center">
+                            <label class="toggle-switch relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="win_8" checked onchange="calculateProfit()" class="sr-only">
+                                <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mt-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
-                    <p class="font-medium">Note on Odds:</p>
+                <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+                    <p class="font-medium mb-2">How it works:</p>
+                    <ul class="list-disc ml-4 space-y-1">
+                        <li>Choose your number of teams (3-8)</li>
+                        <li>Select which combination sizes you want (e.g., 2 out of 5 teams, 4 out of 5 teams)</li>
+                        <li>Enter odds for each team and toggle win/loss</li>
+                        <li>The calculator automatically generates all possible combinations</li>
+                    </ul>
+                    <p class="font-medium mt-3">Note on Odds:</p>
                     <p>This calculator uses Decimal Odds (e.g., 3.00, which includes your stake). Please ensure all odds are $1.01$ or greater.</p>
                 </div>
             </div>
@@ -313,6 +309,9 @@
     </div>
 
     <script>
+        let currentTeamCount = 3;
+        let selectedSystems = new Set([2, 3]); // Default: doubles and trebles (like Trixie)
+
         // Debounce utility to limit function calls
         let timeout;
         function debounce(func, delay = 100) {
@@ -321,10 +320,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Set initial state descriptions and run calculation on load
-            const initialBetType = document.querySelector('input[name="bet_type"]:checked').value;
-            updateBetTypeDescription(initialBetType);
-            calculateProfit();
+            updateTeamCount();
             
             // Add listeners to input fields
             document.querySelectorAll('input[type="number"], input[type="checkbox"]').forEach(input => {
@@ -332,62 +328,134 @@
             });
         });
 
-        function updateSelectionCount() {
-            const selectionCount = parseInt(document.getElementById('selection_count').value);
+        function updateTeamCount() {
+            currentTeamCount = parseInt(document.getElementById('team_count').value);
             
-            // Hide all sections first
-            document.getElementById('four_selection_section').style.display = 'none';
-            document.getElementById('five_selection_section').style.display = 'none';
-            document.getElementById('six_selection_section').style.display = 'none';
-            
-            // Hide selection inputs D, E, F
-            document.getElementById('selection_d').style.display = 'none';
-            document.getElementById('selection_e').style.display = 'none';
-            document.getElementById('selection_f').style.display = 'none';
-            
-            // Show relevant sections and inputs based on selection count
-            if (selectionCount >= 4) {
-                document.getElementById('four_selection_section').style.display = 'block';
-                document.getElementById('selection_d').style.display = 'grid';
-            }
-            if (selectionCount >= 5) {
-                document.getElementById('five_selection_section').style.display = 'block';
-                document.getElementById('selection_e').style.display = 'grid';
-            }
-            if (selectionCount >= 6) {
-                document.getElementById('six_selection_section').style.display = 'block';
-                document.getElementById('selection_f').style.display = 'grid';
+            // Hide all team selections first
+            for (let i = 1; i <= 8; i++) {
+                const element = document.getElementById(`selection_${String.fromCharCode(96 + i)}`);
+                if (element) {
+                    element.style.display = i <= currentTeamCount ? 'grid' : 'none';
+                }
             }
             
-            // Select appropriate default bet type
-            if (selectionCount === 3) {
-                document.getElementById('trixie').checked = true;
-            } else if (selectionCount === 4) {
-                document.getElementById('yankee').checked = true;
-            } else if (selectionCount === 5) {
-                document.getElementById('canadian').checked = true;
-            } else if (selectionCount === 6) {
-                document.getElementById('heinz').checked = true;
-            }
+            // Special handling for A, B, C (always visible for 3+ teams)
+            document.getElementById('selection_d').style.display = currentTeamCount >= 4 ? 'grid' : 'none';
+            document.getElementById('selection_e').style.display = currentTeamCount >= 5 ? 'grid' : 'none';
+            document.getElementById('selection_f').style.display = currentTeamCount >= 6 ? 'grid' : 'none';
+            document.getElementById('selection_g').style.display = currentTeamCount >= 7 ? 'grid' : 'none';
+            document.getElementById('selection_h').style.display = currentTeamCount >= 8 ? 'grid' : 'none';
             
+            generateSystemCheckboxes();
+            updateBetPreview();
             calculateProfit();
         }
 
-        // Bet type definitions
-        const betTypes = {
-            'trixie': { selections: 3, bets: 4, description: 'Trixie: 4 bets (3 Doubles, 1 Treble). Minimum 2 winning selections required for a return.' },
-            'patent': { selections: 3, bets: 7, description: 'Patent: 7 bets (3 Singles, 3 Doubles, 1 Treble). Minimum 1 winning selection required for a return.' },
-            'yankee': { selections: 4, bets: 11, description: 'Yankee: 11 bets (6 Doubles, 4 Trebles, 1 Four-fold). Minimum 2 winning selections required for a return.' },
-            'lucky15': { selections: 4, bets: 15, description: 'Lucky 15: 15 bets (4 Singles, 6 Doubles, 4 Trebles, 1 Four-fold). Minimum 1 winning selection required for a return.' },
-            'canadian': { selections: 5, bets: 26, description: 'Canadian: 26 bets (10 Doubles, 10 Trebles, 5 Four-folds, 1 Five-fold). Minimum 2 winning selections required for a return.' },
-            'lucky31': { selections: 5, bets: 31, description: 'Lucky 31: 31 bets (5 Singles, 10 Doubles, 10 Trebles, 5 Four-folds, 1 Five-fold). Minimum 1 winning selection required for a return.' },
-            'heinz': { selections: 6, bets: 57, description: 'Heinz: 57 bets (15 Doubles, 20 Trebles, 15 Four-folds, 6 Five-folds, 1 Six-fold). Minimum 2 winning selections required for a return.' },
-            'lucky63': { selections: 6, bets: 63, description: 'Lucky 63: 63 bets (6 Singles, 15 Doubles, 20 Trebles, 15 Four-folds, 6 Five-folds, 1 Six-fold). Minimum 1 winning selection required for a return.' }
-        };
+        function generateSystemCheckboxes() {
+            const container = document.getElementById('system_checkboxes');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= currentTeamCount; i++) {
+                const div = document.createElement('div');
+                div.className = 'flex items-center p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `system_${i}`;
+                checkbox.className = 'mr-3 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500';
+                checkbox.checked = selectedSystems.has(i);
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
+                        selectedSystems.add(i);
+                    } else {
+                        selectedSystems.delete(i);
+                    }
+                    updateBetPreview();
+                    calculateProfit();
+                });
+                
+                const label = document.createElement('label');
+                label.htmlFor = `system_${i}`;
+                label.className = 'cursor-pointer font-medium text-gray-700';
+                label.textContent = getSystemName(i);
+                
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                container.appendChild(div);
+            }
+        }
 
-        function updateBetTypeDescription(betType) {
-            const descElement = document.getElementById('bet_type_description');
-            descElement.textContent = betTypes[betType].description;
+        function getSystemName(size) {
+            const names = {
+                1: 'Singles',
+                2: 'Doubles',
+                3: 'Trebles',
+                4: 'Four-folds',
+                5: 'Five-folds',
+                6: 'Six-folds',
+                7: 'Seven-folds',
+                8: 'Eight-folds'
+            };
+            return names[size] || `${size}-folds`;
+        }
+
+        function selectPreset(preset) {
+            selectedSystems.clear();
+            
+            switch(preset) {
+                case 'singles':
+                    selectedSystems.add(1);
+                    break;
+                case 'doubles':
+                    selectedSystems.add(2);
+                    break;
+                case 'trebles':
+                    selectedSystems.add(3);
+                    break;
+                case 'patent':
+                    selectedSystems.add(1);
+                    selectedSystems.add(2);
+                    selectedSystems.add(3);
+                    break;
+                case 'all':
+                    for (let i = 1; i <= currentTeamCount; i++) {
+                        selectedSystems.add(i);
+                    }
+                    break;
+            }
+            
+            // Update checkboxes
+            for (let i = 1; i <= currentTeamCount; i++) {
+                const checkbox = document.getElementById(`system_${i}`);
+                if (checkbox) checkbox.checked = selectedSystems.has(i);
+            }
+            
+            updateBetPreview();
+            calculateProfit();
+        }
+
+        function nCr(n, r) {
+            if (r > n || r < 0) return 0;
+            if (r === 0 || r === n) return 1;
+            
+            let result = 1;
+            for (let i = 0; i < r; i++) {
+                result *= (n - i) / (i + 1);
+            }
+            return Math.round(result);
+        }
+
+        function updateBetPreview() {
+            let totalBets = 0;
+            for (const systemSize of selectedSystems) {
+                totalBets += nCr(currentTeamCount, systemSize);
+            }
+            
+            const stake = parseFloat(document.getElementById('unit_stake').value) || 0;
+            const totalStake = stake * totalBets;
+            
+            document.getElementById('total_bets_preview').textContent = totalBets;
+            document.getElementById('total_stake_preview').textContent = `$${totalStake.toFixed(2)}`;
         }
 
         // Generate all combinations of given size from array
@@ -406,29 +474,30 @@
         }
 
         function calculateProfit() {
-            // 1. Get Inputs
             const stake = parseFloat(document.getElementById('unit_stake').value) || 0;
-            const betType = document.querySelector('input[name="bet_type"]:checked').value;
             
-            updateBetTypeDescription(betType);
+            if (selectedSystems.size === 0) {
+                // No systems selected
+                document.getElementById('total_bets').textContent = '0';
+                document.getElementById('total_stake_output').textContent = '$0.00';
+                document.getElementById('total_return_output').textContent = '$0.00';
+                document.getElementById('total_profit_output').textContent = '$0.00';
+                document.getElementById('breakdown_content').innerHTML = '<div class="text-gray-500 text-sm">Select at least one system to calculate profits</div>';
+                return;
+            }
 
-            const selectionCount = betTypes[betType].selections;
             const odds = [];
             const wins = [];
 
-            // Read odds and win/loss status for all selections
-            for (let i = 1; i <= selectionCount; i++) {
+            // Read odds and win/loss status for all teams
+            for (let i = 1; i <= currentTeamCount; i++) {
                 let currentOdds = parseFloat(document.getElementById(`odds_${i}`).value);
                 odds.push(currentOdds > 1.0 ? currentOdds : 1.0);
                 wins.push(document.getElementById(`win_${i}`).checked);
             }
 
-            const numBets = betTypes[betType].bets;
-
             if (stake <= 0) {
-                // Clear outputs if stake is invalid
-                document.getElementById('total_bets').textContent = numBets;
-                document.getElementById('total_stake_output').textContent = '$0.00';
+                updateBetPreview();
                 document.getElementById('total_return_output').textContent = '$0.00';
                 document.getElementById('total_profit_output').textContent = '$0.00';
                 document.getElementById('breakdown_content').innerHTML = '';
@@ -437,6 +506,8 @@
 
             let totalReturns = 0;
             let breakdown = [];
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+            const teamIndices = Array.from({length: currentTeamCount}, (_, i) => i);
 
             // Helper for calculating multiple bet
             const calculateMultiple = (indices, betName) => {
@@ -457,81 +528,41 @@
                 breakdown.push({ name: betName, return: finalReturn, win: isWin });
             };
 
-            // Generate all bet combinations based on bet type
-            const selectionIndices = Array.from({length: selectionCount}, (_, i) => i);
-            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
-
-            // Singles (for Patent, Lucky 15, Lucky 31, Lucky 63)
-            if (['patent', 'lucky15', 'lucky31', 'lucky63'].includes(betType)) {
-                for (let i = 0; i < selectionCount; i++) {
-                    const result = wins[i] ? stake * odds[i] : 0;
-                    totalReturns += result;
-                    breakdown.push({ name: `Single (${letters[i]})`, return: result, win: wins[i] });
-                }
-            }
-
-            // Doubles
-            const doubles = getCombinations(selectionIndices, 2);
-            doubles.forEach((combo, index) => {
-                const comboLetters = combo.map(i => letters[i]).join(' & ');
-                calculateMultiple(combo, `Double (${comboLetters})`);
-            });
-
-            // Trebles
-            if (selectionCount >= 3) {
-                const trebles = getCombinations(selectionIndices, 3);
-                trebles.forEach((combo, index) => {
-                    const comboLetters = combo.map(i => letters[i]).join(', ');
-                    calculateMultiple(combo, `Treble (${comboLetters})`);
+            // Generate bets for each selected system
+            for (const systemSize of selectedSystems) {
+                const combinations = getCombinations(teamIndices, systemSize);
+                combinations.forEach(combo => {
+                    const comboLetters = combo.map(i => letters[i]).join(systemSize > 2 ? ', ' : ' & ');
+                    const betName = `${getSystemName(systemSize).slice(0, -1)} (${comboLetters})`;
+                    calculateMultiple(combo, betName);
                 });
             }
 
-            // Four-folds
-            if (selectionCount >= 4) {
-                const fourfolds = getCombinations(selectionIndices, 4);
-                fourfolds.forEach((combo, index) => {
-                    const comboLetters = combo.map(i => letters[i]).join(', ');
-                    calculateMultiple(combo, `Four-fold (${comboLetters})`);
-                });
+            // Calculate totals
+            let totalBets = 0;
+            for (const systemSize of selectedSystems) {
+                totalBets += nCr(currentTeamCount, systemSize);
             }
-
-            // Five-folds
-            if (selectionCount >= 5) {
-                const fivefolds = getCombinations(selectionIndices, 5);
-                fivefolds.forEach((combo, index) => {
-                    const comboLetters = combo.map(i => letters[i]).join(', ');
-                    calculateMultiple(combo, `Five-fold (${comboLetters})`);
-                });
-            }
-
-            // Six-fold
-            if (selectionCount >= 6) {
-                const sixfold = getCombinations(selectionIndices, 6);
-                sixfold.forEach((combo, index) => {
-                    const comboLetters = combo.map(i => letters[i]).join(', ');
-                    calculateMultiple(combo, `Six-fold (${comboLetters})`);
-                });
-            }
-
-            // Final calculations
-            const totalStake = stake * numBets;
+            
+            const totalStake = stake * totalBets;
             const profit = totalReturns - totalStake;
 
             // Output results
-            document.getElementById('total_bets').textContent = numBets;
+            document.getElementById('total_bets').textContent = totalBets;
             document.getElementById('total_stake_output').textContent = `$${totalStake.toFixed(2)}`;
             document.getElementById('total_return_output').textContent = `$${totalReturns.toFixed(2)}`;
             
             const profitOutput = document.getElementById('total_profit_output');
             profitOutput.textContent = `$${profit.toFixed(2)}`;
-            profitOutput.classList.toggle('text-green-500', profit > 0);
-            profitOutput.classList.toggle('text-red-500', profit < 0);
-            profitOutput.classList.toggle('text-gray-700', profit === 0);
+            profitOutput.classList.remove('text-green-500', 'text-red-500', 'text-gray-700');
+            if (profit > 0) profitOutput.classList.add('text-green-500');
+            else if (profit < 0) profitOutput.classList.add('text-red-500');
+            else profitOutput.classList.add('text-gray-700');
 
-            // Output Breakdown (show top 10 results to avoid overwhelming display)
+            // Output Breakdown (show top 20 results to avoid overwhelming display)
             let breakdownHtml = '';
             const sortedBreakdown = breakdown.sort((a, b) => b.return - a.return);
-            const displayBreakdown = sortedBreakdown.slice(0, 15); // Show top 15 results
+            const displayBreakdown = sortedBreakdown.slice(0, 20);
 
             displayBreakdown.forEach(item => {
                 const color = item.return > 0 ? 'text-green-600' : 'text-gray-500';
@@ -544,15 +575,17 @@
                 `;
             });
 
-            if (breakdown.length > 15) {
-                breakdownHtml += `<div class="text-xs text-gray-500 mt-2 text-center">... and ${breakdown.length - 15} more bets</div>`;
+            if (breakdown.length > 20) {
+                breakdownHtml += `<div class="text-xs text-gray-500 mt-2 text-center">... and ${breakdown.length - 20} more bets</div>`;
             }
 
             document.getElementById('breakdown_content').innerHTML = breakdownHtml;
         }
 
-        // Initial calculation to populate fields
-        window.onload = calculateProfit;
+        // Initial setup when page loads
+        window.onload = function() {
+            updateTeamCount();
+        };
     </script>
 </body>
 </html>

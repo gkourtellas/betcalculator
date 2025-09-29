@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Group System Betting Calculator v2.2</title>
+    <title>Group System Betting Calculator v2.6</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Additional styles for group system types */
@@ -63,7 +63,7 @@
                 <h1 class="text-3xl font-extrabold text-gray-800">
                     Group System Betting Calculator
                 </h1>
-                <p class="text-sm text-gray-500 mt-1">Version 2.5</p>
+                <p class="text-sm text-gray-500 mt-1">Version 2.6</p>
             </div>
             <div class="flex gap-3">
                 <button onclick="calculateProfit()" 
@@ -200,6 +200,25 @@
             }
             
             generateGroupsUI();
+        }
+
+        function buildGroupSystemTypeOptions() {
+            const container = document.getElementById('group_system_types');
+            if (!container) return; // safety
+            container.innerHTML = '';
+            // Only show if at least 2 groups
+            if (numGroups < 2) return;
+            for (let size = 2; size <= numGroups; size++) {
+                const labelMap = {2: 'Doubles', 3: 'Trebles'};
+                const name = labelMap[size] || `${size}-Folds`;
+                const id = `group_size_${size}`;
+                const wrapper = document.createElement('label');
+                wrapper.className = 'flex items-center gap-2 bg-gray-100 px-3 py-1 rounded text-xs cursor-pointer hover:bg-gray-200';
+                wrapper.innerHTML = `<input id="${id}" type="checkbox" class="group-size-checkbox" value="${size}" onchange="calculateProfit()"> <span>${name}</span>`;
+                // default: select doubles only
+                if (size === 2) wrapper.querySelector('input').checked = true;
+                container.appendChild(wrapper);
+            }
         }
 
         function generateGroupsUI() {
@@ -349,67 +368,85 @@
             const selectedGroupSizeElems = Array.from(document.querySelectorAll('.group-size-checkbox:checked'));
             const selectedGroupSizes = selectedGroupSizeElems.map(el => parseInt(el.value)).sort((a,b)=>a-b);
 
-            // If no stake, reset view
+            // Reset if no stake
             if (stake <= 0) {
-                document.getElementById('total_bets').textContent = '0';
-                document.getElementById('total_stake').textContent = '$0.00';
-                document.getElementById('total_returns').textContent = '$0.00';
-                document.getElementById('net_profit').textContent = '$0.00';
+                ['total_bets','total_stake','total_returns','net_profit'].forEach(id => {
+                    document.getElementById(id).textContent = id.includes('bets') ? '0' : '$0.00';
+                });
                 document.getElementById('breakdown_content').textContent = 'Enter a stake to calculate profits';
                 return;
             }
 
-            // PRE-CALC: theoretical total bets (original logic for now)
-            let totalBets = 1;
-            for (let i = 0; i < numGroups; i++) {
-                const g = groupsData[i];
-                let betsForGroup = 0;
-                for (let r = g.required; r <= g.teams; r++) betsForGroup += nCr(g.teams, r);
-                totalBets *= betsForGroup;
-            }
-            const totalStake = stake * totalBets;
-
-            let successfulGroups = 0;
-            let groupReturns = []; // per-group return (money) using only WIN info
-            let breakdownLines = [];
-
-            for (let gi = 0; gi < numGroups; gi++) {
-                const group = groupsData[gi];
-                const winnersIdx = group.wins.map((w, idx) => w ? idx : null).filter(v => v !== null);
-                const winnersCount = winnersIdx.length;
+            // Build per-group stats
+            const groupStats = groupsData.map((group, gi) => {
+                const winnersIdx = group.wins.map((w,i)=>w?i:null).filter(v=>v!==null);
                 const needed = group.required;
-
-                if (winnersCount < needed) {
-                    groupReturns.push(0);
-                    breakdownLines.push(`Group ${String.fromCharCode(65 + gi)}: FAIL (${winnersCount}/${needed}) Return $0.00`);
-                    continue;
+                if (winnersIdx.length < needed) {
+                    return { index: gi, status: 'FAIL', winnersCount: winnersIdx.length, needed, combosCount:0, sumProducts:0, label: `Group ${String.fromCharCode(65+gi)}` };
                 }
-
-                successfulGroups++;
-                // Sum of ALL combinations of size = needed, comprised only of winners
                 const winnerCombos = getCombinations(winnersIdx, needed);
                 let sumProducts = 0;
                 winnerCombos.forEach(combo => {
-                    let prod = 1;
-                    combo.forEach(idx => prod *= group.odds[idx]);
+                    let prod = 1; combo.forEach(idx => prod *= group.odds[idx]);
                     sumProducts += prod;
                 });
+                return { index: gi, status: 'OK', winnersCount: winnersIdx.length, needed, combosCount: winnerCombos.length, sumProducts, label: `Group ${String.fromCharCode(65+gi)}` };
+            });
 
-                const groupReturnMoney = sumProducts * stake; // money contributed by this group
-                groupReturns.push(groupReturnMoney);
-                breakdownLines.push(`Group ${String.fromCharCode(65 + gi)}: OK (${winnersCount}/${needed}) Combos ${winnerCombos.length} Return $${groupReturnMoney.toFixed(2)}`);
-            }
-
-            // If not enough successful groups, zero everything
+            const successful = groupStats.filter(g => g.status==='OK');
+            let totalBets = 0;
             let totalReturns = 0;
-            if (successfulGroups >= groupsRequired) {
-                // For now total = sum of per-group returns (simpler & transparent)
-                totalReturns = groupReturns.reduce((a, b) => a + b, 0);
+            let breakdownLines = [];
+            let mode = selectedGroupSizes.length ? 'system' : 'threshold';
+
+            if (mode === 'threshold') {
+                // Theoretical bets (legacy): product over groups of sum_{r=required..teams} C(teams,r)
+                totalBets = groupStats.reduce((acc, _, gi) => {
+                    const g = groupsData[gi];
+                    let betsForGroup = 0;
+                    for (let r = g.required; r <= g.teams; r++) betsForGroup += nCr(g.teams, r);
+                    return acc * betsForGroup;
+                }, 1);
+                if (successful.length >= groupsRequired) {
+                    totalReturns = successful.reduce((sum, g) => sum + g.sumProducts * stake, 0);
+                } else {
+                    totalReturns = 0;
+                }
+                breakdownLines.push(`Mode: Threshold (need ${groupsRequired})`);
+            } else {
+                // System types: combinations of successful groups by selected sizes
+                const successIndices = successful.map(g => g.index);
+                selectedGroupSizes.forEach(size => {
+                    if (successIndices.length < size) {
+                        breakdownLines.push(`${size}-Fold: not enough successful groups (${successIndices.length}/${size})`);
+                        return;
+                    }
+                    const groupCombos = getCombinations(successIndices, size);
+                    let foldBets = 0;
+                    let foldReturnFactorSum = 0; // sum over products of sumProducts
+                    groupCombos.forEach(combo => {
+                        let comboReturnFactor = 1;
+                        let comboBets = 1;
+                        combo.forEach(gIndex => {
+                            const gs = groupStats[gIndex];
+                            comboReturnFactor *= gs.sumProducts;
+                            comboBets *= gs.combosCount;
+                        });
+                        foldReturnFactorSum += comboReturnFactor;
+                        foldBets += comboBets;
+                    });
+                    const foldReturnMoney = foldReturnFactorSum * stake;
+                    totalReturns += foldReturnMoney;
+                    totalBets += foldBets;
+                    const label = size===2?'Doubles':(size===3?'Trebles':`${size}-Folds`);
+                    breakdownLines.push(`${label}: Combos ${groupCombos.length} Bets ${foldBets.toLocaleString()} Return $${foldReturnMoney.toFixed(2)}`);
+                });
             }
 
+            const totalStake = stake * totalBets;
             const netProfit = totalReturns - totalStake;
 
-            // Update headline figures
+            // Update UI
             document.getElementById('total_bets').textContent = totalBets.toLocaleString();
             document.getElementById('total_stake').textContent = `$${totalStake.toFixed(2)}`;
             document.getElementById('total_returns').textContent = `$${totalReturns.toFixed(2)}`;
@@ -417,13 +454,19 @@
             profitEl.textContent = `$${netProfit.toFixed(2)}`;
             profitEl.className = netProfit >= 0 ? 'text-2xl font-bold text-green-600' : 'text-2xl font-bold text-red-600';
 
-            // Revised breakdown reflects new per-group + system types (if present)
+            // Breakdown
             let breakdown = '';
-            breakdown += `Successful Groups: ${successfulGroups}/${numGroups}\n`;
-            breakdown += `Total Bets: ${totalBets.toLocaleString()}  Total Stake: $${totalStake.toFixed(2)}\n`;
-            breakdown += `Total Returns: $${totalReturns.toFixed(2)}  Net: $${netProfit.toFixed(2)}\n\n`;
-            breakdown += `Group Detail (required-size winning combos only):\n`;
-            breakdown += breakdownLines.join('\n');
+            breakdown += `Mode: ${mode==='system'?'System Types':'Threshold'}\n`;
+            if (mode==='threshold') breakdown += `Min Groups Required: ${groupsRequired}\n`;
+            if (mode==='system') breakdown += `Selected Group Sizes: ${selectedGroupSizes.join(', ')}\n`;
+            breakdown += `Successful Groups: ${successful.length}/${numGroups}\n`;
+            breakdown += `Total Bets: ${totalBets.toLocaleString()}  Stake: $${totalStake.toFixed(2)}\n`;
+            breakdown += `Returns: $${totalReturns.toFixed(2)}  Net: $${netProfit.toFixed(2)}\n\n`;
+            breakdown += `Per Group (required-size winning combos only):\n`;
+            groupStats.forEach(g => {
+                breakdown += `${g.label} ${g.status} (${g.winnersCount}/${g.needed}) Combos ${g.combosCount} Factor ${g.sumProducts.toFixed(2)} Return $${(g.sumProducts*stake).toFixed(2)}\n`;
+            });
+            breakdown += `\nSystem Detail:\n` + breakdownLines.join('\n');
             document.getElementById('breakdown_content').textContent = breakdown;
         }
 

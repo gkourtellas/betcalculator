@@ -229,9 +229,10 @@
                     <span class="font-medium text-gray-700">Team ${i + 1}</span>
                     <input type="number" id="group_${groupIndex}_odds_${i}" value="1.50" min="1.01" step="0.01" 
                            oninput="updateOdds(${groupIndex}, ${i})" class="px-3 py-2 border border-gray-300 rounded-lg">
-                    <div class="flex justify-center">
+                    <div class="flex justify-center items-center gap-2">
+                        <span id="group_${groupIndex}_label_${i}" class="text-xs font-medium text-green-600">WIN</span>
                         <label class="toggle-switch relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="group_${groupIndex}_win_${i}" checked onchange="updateWin(${groupIndex}, ${i})" class="sr-only">
+                            <input type="checkbox" id="group_${groupIndex}_win_${i}" checked onchange="updateGroupToggleLabel(${groupIndex}, ${i}); updateWin(${groupIndex}, ${i})" class="sr-only">
                             <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                         </label>
                     </div>
@@ -256,6 +257,20 @@
         function updateWin(groupIndex, teamIndex) {
             groupsData[groupIndex].wins[teamIndex] = document.getElementById(`group_${groupIndex}_win_${teamIndex}`).checked;
             calculateProfit();
+        }
+
+        // Function to update group toggle label text and color
+        function updateGroupToggleLabel(groupIndex, teamIndex) {
+            const checkbox = document.getElementById(`group_${groupIndex}_win_${teamIndex}`);
+            const label = document.getElementById(`group_${groupIndex}_label_${teamIndex}`);
+            
+            if (checkbox.checked) {
+                label.textContent = 'WIN';
+                label.className = 'text-xs font-medium text-green-600';
+            } else {
+                label.textContent = 'LOSS';
+                label.className = 'text-xs font-medium text-red-600';
+            }
         }
 
         // Combination calculation helper

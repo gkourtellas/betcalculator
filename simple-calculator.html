@@ -177,9 +177,10 @@
                         <span class="font-medium text-gray-700">A</span>
                         <input type="number" id="odds_1" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
-                        <div class="flex justify-center">
+                        <div class="flex justify-center items-center gap-2">
+                            <span id="win_label_1" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="win_1" checked onchange="calculateProfit()" class="sr-only">
+                                <input type="checkbox" id="win_1" checked onchange="updateToggleLabel(1); calculateProfit()" class="sr-only">
                                 <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
@@ -190,9 +191,10 @@
                         <span class="font-medium text-gray-700">B</span>
                         <input type="number" id="odds_2" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
-                        <div class="flex justify-center">
+                        <div class="flex justify-center items-center gap-2">
+                            <span id="win_label_2" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="win_2" checked onchange="calculateProfit()" class="sr-only">
+                                <input type="checkbox" id="win_2" checked onchange="updateToggleLabel(2); calculateProfit()" class="sr-only">
                                 <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
@@ -203,9 +205,10 @@
                         <span class="font-medium text-gray-700">C</span>
                         <input type="number" id="odds_3" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
-                        <div class="flex justify-center">
+                        <div class="flex justify-center items-center gap-2">
+                            <span id="win_label_3" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="win_3" checked onchange="calculateProfit()" class="sr-only">
+                                <input type="checkbox" id="win_3" checked onchange="updateToggleLabel(3); calculateProfit()" class="sr-only">
                                 <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
@@ -216,9 +219,10 @@
                         <span class="font-medium text-gray-700">D</span>
                         <input type="number" id="odds_4" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
-                        <div class="flex justify-center">
+                        <div class="flex justify-center items-center gap-2">
+                            <span id="win_label_4" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="win_4" checked onchange="calculateProfit()" class="sr-only">
+                                <input type="checkbox" id="win_4" checked onchange="updateToggleLabel(4); calculateProfit()" class="sr-only">
                                 <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
@@ -229,9 +233,10 @@
                         <span class="font-medium text-gray-700">E</span>
                         <input type="number" id="odds_5" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
-                        <div class="flex justify-center">
+                        <div class="flex justify-center items-center gap-2">
+                            <span id="win_label_5" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="win_5" checked onchange="calculateProfit()" class="sr-only">
+                                <input type="checkbox" id="win_5" checked onchange="updateToggleLabel(5); calculateProfit()" class="sr-only">
                                 <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
@@ -242,9 +247,10 @@
                         <span class="font-medium text-gray-700">F</span>
                         <input type="number" id="odds_6" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
-                        <div class="flex justify-center">
+                        <div class="flex justify-center items-center gap-2">
+                            <span id="win_label_6" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="win_6" checked onchange="calculateProfit()" class="sr-only">
+                                <input type="checkbox" id="win_6" checked onchange="updateToggleLabel(6); calculateProfit()" class="sr-only">
                                 <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
@@ -255,9 +261,10 @@
                         <span class="font-medium text-gray-700">G</span>
                         <input type="number" id="odds_7" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
-                        <div class="flex justify-center">
+                        <div class="flex justify-center items-center gap-2">
+                            <span id="win_label_7" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="win_7" checked onchange="calculateProfit()" class="sr-only">
+                                <input type="checkbox" id="win_7" checked onchange="updateToggleLabel(7); calculateProfit()" class="sr-only">
                                 <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
@@ -268,9 +275,10 @@
                         <span class="font-medium text-gray-700">H</span>
                         <input type="number" id="odds_8" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
-                        <div class="flex justify-center">
+                        <div class="flex justify-center items-center gap-2">
+                            <span id="win_label_8" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="win_8" checked onchange="calculateProfit()" class="sr-only">
+                                <input type="checkbox" id="win_8" checked onchange="updateToggleLabel(8); calculateProfit()" class="sr-only">
                                 <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
@@ -608,6 +616,20 @@
             document.getElementById('breakdown_content').innerHTML = breakdownHtml;
         }
 
+        // Function to update toggle label text and color
+        function updateToggleLabel(teamNumber) {
+            const checkbox = document.getElementById(`win_${teamNumber}`);
+            const label = document.getElementById(`win_label_${teamNumber}`);
+            
+            if (checkbox.checked) {
+                label.textContent = 'WIN';
+                label.className = 'text-xs font-medium text-green-600';
+            } else {
+                label.textContent = 'LOSS';
+                label.className = 'text-xs font-medium text-red-600';
+            }
+        }
+
         // Function to copy default odds to all team selections
         function copyDefaultOdds() {
             const defaultOdds = document.getElementById('default_odds').value;
@@ -641,6 +663,10 @@
         // Initial setup when page loads
         window.onload = function() {
             updateTeamCount();
+            // Initialize all toggle labels
+            for (let i = 1; i <= 8; i++) {
+                updateToggleLabel(i);
+            }
         };
     </script>
 </body>

@@ -182,7 +182,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <!-- Input Panel -->
-            <div class="lg:col-span-2">
+            <div class="lg:col-span-2" id="team_inputs_section">
                 <h2 class="text-xl font-semibold text-gray-700 mb-3">Bet Details</h2>
                 
                 <!-- Stake Input -->
@@ -205,7 +205,7 @@
                     <!-- Selection A -->
                     <div class="grid grid-cols-3 gap-4 items-center">
                         <span class="font-medium text-gray-700">A</span>
-                        <input type="number" id="odds_1" value="2.50" min="1.01" step="0.01" oninput="calculateProfit()"
+                        <input type="number" id="odds_1" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
                         <div class="flex justify-center">
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
@@ -218,7 +218,7 @@
                     <!-- Selection B -->
                     <div class="grid grid-cols-3 gap-4 items-center">
                         <span class="font-medium text-gray-700">B</span>
-                        <input type="number" id="odds_2" value="3.00" min="1.01" step="0.01" oninput="calculateProfit()"
+                        <input type="number" id="odds_2" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
                         <div class="flex justify-center">
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
@@ -231,7 +231,7 @@
                     <!-- Selection C -->
                     <div class="grid grid-cols-3 gap-4 items-center">
                         <span class="font-medium text-gray-700">C</span>
-                        <input type="number" id="odds_3" value="4.00" min="1.01" step="0.01" oninput="calculateProfit()"
+                        <input type="number" id="odds_3" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
                         <div class="flex justify-center">
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
@@ -244,7 +244,7 @@
                     <!-- Selection D -->
                     <div class="grid grid-cols-3 gap-4 items-center" id="selection_d" style="display: none;">
                         <span class="font-medium text-gray-700">D</span>
-                        <input type="number" id="odds_4" value="2.00" min="1.01" step="0.01" oninput="calculateProfit()"
+                        <input type="number" id="odds_4" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
                         <div class="flex justify-center">
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
@@ -257,7 +257,7 @@
                     <!-- Selection E -->
                     <div class="grid grid-cols-3 gap-4 items-center" id="selection_e" style="display: none;">
                         <span class="font-medium text-gray-700">E</span>
-                        <input type="number" id="odds_5" value="3.50" min="1.01" step="0.01" oninput="calculateProfit()"
+                        <input type="number" id="odds_5" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
                         <div class="flex justify-center">
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
@@ -270,7 +270,7 @@
                     <!-- Selection F -->
                     <div class="grid grid-cols-3 gap-4 items-center" id="selection_f" style="display: none;">
                         <span class="font-medium text-gray-700">F</span>
-                        <input type="number" id="odds_6" value="2.25" min="1.01" step="0.01" oninput="calculateProfit()"
+                        <input type="number" id="odds_6" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
                         <div class="flex justify-center">
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
@@ -283,7 +283,7 @@
                     <!-- Selection G -->
                     <div class="grid grid-cols-3 gap-4 items-center" id="selection_g" style="display: none;">
                         <span class="font-medium text-gray-700">G</span>
-                        <input type="number" id="odds_7" value="1.80" min="1.01" step="0.01" oninput="calculateProfit()"
+                        <input type="number" id="odds_7" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
                         <div class="flex justify-center">
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
@@ -296,7 +296,7 @@
                     <!-- Selection H -->
                     <div class="grid grid-cols-3 gap-4 items-center" id="selection_h" style="display: none;">
                         <span class="font-medium text-gray-700">H</span>
-                        <input type="number" id="odds_8" value="2.10" min="1.01" step="0.01" oninput="calculateProfit()"
+                        <input type="number" id="odds_8" value="1.50" min="1.01" step="0.01" oninput="calculateProfit()"
                                class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
                         <div class="flex justify-center">
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
@@ -662,6 +662,7 @@
             document.getElementById('simple_mode_section').style.display = mode === 'simple' ? 'block' : 'none';
             document.getElementById('group_mode_section').style.display = mode === 'group' ? 'block' : 'none';
             document.getElementById('simple_team_section').style.display = mode === 'simple' ? 'block' : 'none';
+            document.getElementById('team_inputs_section').style.display = mode === 'simple' ? 'block' : 'none';
             
             if (mode === 'group') {
                 updateGroupConfiguration();
@@ -762,7 +763,7 @@
                 teamDiv.className = 'grid grid-cols-3 gap-4 items-center';
                 teamDiv.innerHTML = `
                     <span class="font-medium text-gray-700">Team ${letters[i]}</span>
-                    <input type="number" id="group_${groupIndex}_odds_${i}" value="${2.0 + Math.random()}" min="1.01" step="0.01" 
+                    <input type="number" id="group_${groupIndex}_odds_${i}" value="1.50" min="1.01" step="0.01" 
                            oninput="calculateGroupProfit()" class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
                     <div class="flex justify-center">
                         <label class="toggle-switch relative inline-flex items-center cursor-pointer">

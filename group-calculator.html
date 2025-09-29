@@ -364,70 +364,44 @@
 
             const totalStake = stake * totalBets;
 
-            // Calculate returns by simulating all possible outcomes
+            // Calculate returns based on CURRENT win/loss toggles
             let totalReturns = 0;
-            let winningScenarios = 0;
-
-            // Generate all possible combinations of group outcomes
-            const groupOutcomes = [];
-            for (let i = 0; i < numGroups; i++) {
-                const group = groupsData[i];
-                const outcomes = [];
-
-                // For each possible winning combination in this group
-                for (let r = group.required; r <= group.teams; r++) {
-                    const combinations = getCombinations(Array.from({length: group.teams}, (_, idx) => idx), r);
-                    combinations.forEach(combo => {
-                        // Calculate return for this specific combination
-                        let comboReturn = 1;
-                        combo.forEach(teamIdx => {
-                            comboReturn *= group.odds[teamIdx];
-                        });
-                        outcomes.push({
-                            combination: combo,
-                            return: comboReturn,
-                            winners: combo.length
-                        });
-                    });
-                }
-                groupOutcomes.push(outcomes);
-            }
-
-            // Now calculate all possible system outcomes
-            // This is a simplified approach - in reality, we'd need to iterate through all combinations
-            // For now, let's calculate based on current win/loss settings
-
-            let systemReturn = 0;
             let successfulGroups = 0;
+            let breakdownDetails = [];
 
-            for (let i = 0; i < numGroups; i++) {
-                const group = groupsData[i];
-                const winningTeams = group.wins.filter(w => w).length;
+            for (let groupIndex = 0; groupIndex < numGroups; groupIndex++) {
+                const group = groupsData[groupIndex];
+                const winningTeams = group.wins.filter(win => win).length;
 
                 if (winningTeams >= group.required) {
+                    // This group succeeds - calculate its contribution
                     successfulGroups++;
 
-                    // Find the best return for this group's current winners
-                    const currentWinners = [];
+                    // Find the best combination of required winners
+                    const winnerIndices = [];
                     group.wins.forEach((win, idx) => {
-                        if (win) currentWinners.push(idx);
+                        if (win) winnerIndices.push(idx);
                     });
 
-                    if (currentWinners.length >= group.required) {
-                        // Calculate return for the best combination of required winners
-                        const bestWinners = currentWinners.slice(0, group.required);
-                        let groupReturn = 1;
-                        bestWinners.forEach(teamIdx => {
-                            groupReturn *= group.odds[teamIdx];
-                        });
-                        systemReturn += groupReturn;
-                    }
+                    // Take the first 'required' number of winners (simplified approach)
+                    const selectedWinners = winnerIndices.slice(0, group.required);
+
+                    // Calculate return for this combination
+                    let groupReturn = 1;
+                    selectedWinners.forEach(teamIdx => {
+                        groupReturn *= group.odds[teamIdx];
+                    });
+
+                    totalReturns += groupReturn * stake;
+                    breakdownDetails.push(`Group ${String.fromCharCode(65 + groupIndex)}: $${(groupReturn * stake).toFixed(2)} (${selectedWinners.length} winners)`);
+                } else {
+                    breakdownDetails.push(`Group ${String.fromCharCode(65 + groupIndex)}: $0.00 (only ${winningTeams}/${group.required} winners)`);
                 }
             }
 
             // Only pay out if enough groups are successful
-            if (successfulGroups >= groupsRequired) {
-                totalReturns = systemReturn * stake;
+            if (successfulGroups < groupsRequired) {
+                totalReturns = 0;
             }
 
             const netProfit = totalReturns - totalStake;
@@ -445,9 +419,12 @@
             let breakdownText = `Total Groups: ${numGroups}, Groups Required: ${groupsRequired}\n`;
             breakdownText += `Total Bets: ${totalBets.toLocaleString()}\n`;
             breakdownText += `Successful Groups: ${successfulGroups}/${numGroups}\n`;
-            breakdownText += `System Return: $${systemReturn.toFixed(2)} per bet\n`;
             breakdownText += `Total Returns: $${totalReturns.toFixed(2)}\n`;
-            breakdownText += `Net Profit: $${netProfit.toFixed(2)}`;
+            breakdownText += `Net Profit: $${netProfit.toFixed(2)}\n\n`;
+            breakdownText += `Group Breakdown:\n`;
+            breakdownDetails.forEach(detail => {
+                breakdownText += `${detail}\n`;
+            });
 
             document.getElementById('breakdown_content').textContent = breakdownText;
         }

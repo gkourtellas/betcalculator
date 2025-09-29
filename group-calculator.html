@@ -369,6 +369,13 @@
             const selectedGroupSizeElems = Array.from(document.querySelectorAll('.group-size-checkbox:checked'));
             const selectedGroupSizes = selectedGroupSizeElems.map(el => parseInt(el.value)).sort((a,b)=>a-b);
 
+            // Base total bets (original tickets placed) DOES NOT change with win/loss
+            const baseTotalBets = groupsData.reduce((acc, g) => {
+                let groupBets = 0;
+                for (let r = g.required; r <= g.teams; r++) groupBets += nCr(g.teams, r);
+                return acc * groupBets;
+            }, 1);
+
             // Reset if no stake
             if (stake <= 0) {
                 ['total_bets','total_stake','total_returns','net_profit'].forEach(id => {
@@ -395,19 +402,13 @@
             });
 
             const successful = groupStats.filter(g => g.status==='OK');
-            let totalBets = 0;
+            // totalBets displayed = base (does not fluctuate with results)
+            let totalBets = baseTotalBets;
             let totalReturns = 0;
             let breakdownLines = [];
             let mode = selectedGroupSizes.length ? 'system' : 'threshold';
 
             if (mode === 'threshold') {
-                // Theoretical bets (legacy): product over groups of sum_{r=required..teams} C(teams,r)
-                totalBets = groupStats.reduce((acc, _, gi) => {
-                    const g = groupsData[gi];
-                    let betsForGroup = 0;
-                    for (let r = g.required; r <= g.teams; r++) betsForGroup += nCr(g.teams, r);
-                    return acc * betsForGroup;
-                }, 1);
                 if (successful.length >= groupsRequired) {
                     totalReturns = successful.reduce((sum, g) => sum + g.sumProducts * stake, 0);
                 } else {
@@ -417,6 +418,7 @@
             } else {
                 // System types: combinations of successful groups by selected sizes
                 const successIndices = successful.map(g => g.index);
+                let winningBets = 0; // count of bets that are still alive / winning structure
                 selectedGroupSizes.forEach(size => {
                     if (successIndices.length < size) {
                         breakdownLines.push(`${size}-Fold: not enough successful groups (${successIndices.length}/${size})`);
@@ -438,13 +440,14 @@
                     });
                     const foldReturnMoney = foldReturnFactorSum * stake;
                     totalReturns += foldReturnMoney;
-                    totalBets += foldBets;
+                    winningBets += foldBets;
                     const label = size===2?'Doubles':(size===3?'Trebles':`${size}-Folds`);
                     breakdownLines.push(`${label}: Combos ${groupCombos.length} Bets ${foldBets.toLocaleString()} Return $${foldReturnMoney.toFixed(2)}`);
                 });
+                breakdownLines.push(`Winning Bets (subset of total placed): ${winningBets.toLocaleString()}`);
             }
 
-            const totalStake = stake * totalBets;
+            const totalStake = stake * baseTotalBets;
             const netProfit = totalReturns - totalStake;
 
             // Update UI
@@ -461,7 +464,11 @@
             if (mode==='threshold') breakdown += `Min Groups Required: ${groupsRequired}\n`;
             if (mode==='system') breakdown += `Selected Group Sizes: ${selectedGroupSizes.join(', ')}\n`;
             breakdown += `Successful Groups: ${successful.length}/${numGroups}\n`;
-            breakdown += `Total Bets: ${totalBets.toLocaleString()}  Stake: $${totalStake.toFixed(2)}\n`;
+            breakdown += `Total Bets Placed: ${baseTotalBets.toLocaleString()}  Stake: $${totalStake.toFixed(2)}\n`;
+            if (mode==='system') {
+                const winningLine = breakdownLines.find(l=>l.startsWith('Winning Bets'));
+                if (winningLine) breakdown += winningLine + "\n";
+            }
             breakdown += `Returns: $${totalReturns.toFixed(2)}  Net: $${netProfit.toFixed(2)}\n\n`;
             breakdown += `Per Group (required-size winning combos only):\n`;
             groupStats.forEach(g => {

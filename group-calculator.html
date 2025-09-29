@@ -371,15 +371,17 @@
                 return;
             }
             
-            const numGroups = parseInt(document.getElementById('num_groups').value);
             let copiedCount = 0;
             
-            // Copy to all visible team odds inputs across all groups
-            for (let groupIndex = 1; groupIndex <= numGroups; groupIndex++) {
-                for (let teamIndex = 1; teamIndex <= 3; teamIndex++) {
-                    const oddsInput = document.getElementById(`group${groupIndex}_odds${teamIndex}`);
-                    if (oddsInput && oddsInput.closest('.team-row').style.display !== 'none') {
+            // Copy to all teams across all groups using the correct ID format
+            for (let groupIndex = 0; groupIndex < numGroups; groupIndex++) {
+                const groupTeams = groupsData[groupIndex].teams;
+                for (let teamIndex = 0; teamIndex < groupTeams; teamIndex++) {
+                    const oddsInput = document.getElementById(`group_${groupIndex}_odds_${teamIndex}`);
+                    if (oddsInput) {
                         oddsInput.value = defaultOdds;
+                        // Update the data array as well
+                        groupsData[groupIndex].odds[teamIndex] = parseFloat(defaultOdds);
                         copiedCount++;
                     }
                 }

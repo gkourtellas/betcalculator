@@ -174,7 +174,7 @@
             for (let i = 0; i < numGroups; i++) {
                 groupsData.push({
                     teams: 3,
-                    required: 2,
+                    allowedSizes: [2],
                     odds: [1.5, 1.5, 1.5],
                     wins: [true, true, true]
                 });
@@ -222,12 +222,9 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Exact Winners Required</label>
-                            <select id="group_${i}_required" onchange="updateGroupRequired(${i})" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                                <option value="1">1</option>
-                                <option value="2" selected>2</option>
-                                <option value="3">3</option>
-                            </select>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Winning Sizes Included</label>
+                            <div id="group_${i}_sizes" class="flex flex-wrap gap-2"></div>
+                            <p class="mt-1 text-[10px] text-gray-500">Select one or more sizes (e.g. 2 & 3) to include.</p>
                         </div>
                     </div>
                     
@@ -246,23 +243,11 @@
         function updateGroupTeams(groupIndex) {
             const teams = parseInt(document.getElementById(`group_${groupIndex}_teams`).value);
             const container = document.getElementById(`group_${groupIndex}_teams_container`);
-            const requiredSelect = document.getElementById(`group_${groupIndex}_required`);
-            
-            // Update required dropdown (exact count choices)
-            requiredSelect.innerHTML = '';
-            for (let i = 1; i <= teams; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i.toString();
-                if (i === Math.min(2, teams)) option.selected = true;
-                requiredSelect.appendChild(option);
-            }
-            
-            // Update group data
             groupsData[groupIndex].teams = teams;
-            groupsData[groupIndex].required = parseInt(requiredSelect.value);
             groupsData[groupIndex].odds = Array(teams).fill(1.5);
             groupsData[groupIndex].wins = Array(teams).fill(true);
+            groupsData[groupIndex].allowedSizes = [Math.min(2, teams)];
+            buildGroupSizeCheckboxes(groupIndex);
             
             // Generate team inputs
             container.innerHTML = '';
@@ -287,8 +272,36 @@
             calculateProfit();
         }
 
-        function updateGroupRequired(groupIndex) {
-            groupsData[groupIndex].required = parseInt(document.getElementById(`group_${groupIndex}_required`).value);
+        // Removed updateGroupRequired (multi-size selection instead)
+
+        function buildGroupSizeCheckboxes(groupIndex) {
+            const wrap = document.getElementById(`group_${groupIndex}_sizes`);
+            if (!wrap) return;
+            wrap.innerHTML = '';
+            const teams = groupsData[groupIndex].teams;
+            for (let size = 1; size <= teams; size++) {
+                const id = `group_${groupIndex}_size_${size}`;
+                const label = document.createElement('label');
+                label.className = 'flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-[11px] cursor-pointer hover:bg-gray-200';
+                const checked = groupsData[groupIndex].allowedSizes.includes(size) ? 'checked' : '';
+                label.innerHTML = `<input type="checkbox" id="${id}" value="${size}" ${checked} onchange="updateGroupAllowedSizes(${groupIndex})"> <span>${size}</span>`;
+                wrap.appendChild(label);
+            }
+        }
+
+        function updateGroupAllowedSizes(groupIndex) {
+            const teams = groupsData[groupIndex].teams;
+            const selected = [];
+            for (let size = 1; size <= teams; size++) {
+                const cb = document.getElementById(`group_${groupIndex}_size_${size}`);
+                if (cb && cb.checked) selected.push(size);
+            }
+            if (!selected.length) {
+                selected.push(1);
+                const cb1 = document.getElementById(`group_${groupIndex}_size_1`);
+                if (cb1) cb1.checked = true;
+            }
+            groupsData[groupIndex].allowedSizes = selected;
             calculateProfit();
         }
 
@@ -348,12 +361,7 @@
             const selectedGroupSizeElems = Array.from(document.querySelectorAll('.group-size-checkbox:checked'));
             const selectedGroupSizes = selectedGroupSizeElems.map(el => parseInt(el.value)).sort((a,b)=>a-b);
 
-            // Base total bets (original tickets placed) DOES NOT change with win/loss
-            const baseTotalBets = groupsData.reduce((acc, g) => {
-                let groupBets = 0;
-                for (let r = g.required; r <= g.teams; r++) groupBets += nCr(g.teams, r);
-                return acc * groupBets;
-            }, 1);
+            // Removed old baseTotalBets tied to single 'required'
 
             // Reset if no stake
             if (stake <= 0) {
@@ -367,17 +375,22 @@
             // Build per-group stats
             const groupStats = groupsData.map((group, gi) => {
                 const winnersIdx = group.wins.map((w,i)=>w?i:null).filter(v=>v!==null);
-                const needed = group.required;
-                if (winnersIdx.length < needed) {
-                    return { index: gi, status: 'FAIL', winnersCount: winnersIdx.length, needed, combosCount:0, sumProducts:0, label: `Group ${String.fromCharCode(65+gi)}` };
-                }
-                const winnerCombos = getCombinations(winnersIdx, needed);
+                let combosCount = 0;
                 let sumProducts = 0;
-                winnerCombos.forEach(combo => {
-                    let prod = 1; combo.forEach(idx => prod *= group.odds[idx]);
-                    sumProducts += prod;
+                let any = false;
+                group.allowedSizes.forEach(sz => {
+                    if (sz <= winnersIdx.length) {
+                        any = true;
+                        const combos = getCombinations(winnersIdx, sz);
+                        combosCount += combos.length;
+                        combos.forEach(c => {
+                            let prod = 1; c.forEach(idx => prod *= group.odds[idx]);
+                            sumProducts += prod;
+                        });
+                    }
                 });
-                return { index: gi, status: 'OK', winnersCount: winnersIdx.length, needed, combosCount: winnerCombos.length, sumProducts, label: `Group ${String.fromCharCode(65+gi)}` };
+                if (!any) return { index: gi, status: 'FAIL', winnersCount: winnersIdx.length, allowed: group.allowedSizes.slice(), combosCount:0, sumProducts:0, label: `Group ${String.fromCharCode(65+gi)}` };
+                return { index: gi, status: 'OK', winnersCount: winnersIdx.length, allowed: group.allowedSizes.slice(), combosCount, sumProducts, label: `Group ${String.fromCharCode(65+gi)}` };
             });
 
             // Require at least one system type selection
@@ -395,7 +408,7 @@
 
             // Compute base total bets for system: sum over each selected group size of all folds * product of required-size combination counts
             let totalBetsPlaced = 0;
-            const perGroupRequiredCombos = groupsData.map(g => nCr(g.teams, g.required));
+            const perGroupRequiredCombos = groupsData.map(g => g.allowedSizes.reduce((sum, sz)=> sum + (sz<=g.teams? nCr(g.teams, sz):0), 0));
             selectedGroupSizes.forEach(size => {
                 if (numGroups < size) return;
                 const groupIndexArr = Array.from({length:numGroups}, (_,i)=>i);
@@ -422,7 +435,7 @@
                 let foldWinningBets = 0;
                 let foldReturnAccumulator = 0;
                 foldGroupCombos.forEach(fold => {
-                    // Tickets for this fold that win = product of required-size winning combos per group
+                    // Tickets for this fold that win = product of winning combos across allowed sizes per group
                     let ticketsForFold = 1;
                     let foldReturnFactor = 1; // product of sumProducts for groups in fold
                     fold.forEach(gIdx => {
@@ -461,9 +474,9 @@
             const roi = totalStake > 0 ? ((totalReturns - totalStake) / totalStake * 100) : 0;
             breakdown += `ROI: ${roi.toFixed(2)}%  Avg Return / Winning Bet: ${winningBets>0 ? '$'+(totalReturns/winningBets).toFixed(2) : '$0.00'}\n`;
             breakdown += `Returns: $${totalReturns.toFixed(2)}  Net: $${netProfit.toFixed(2)}\n\n`;
-            breakdown += `Per Group (required-size winning combos only):\n`;
+            breakdown += `Per Group (allowed sizes -> winning combos):\n`;
             groupStats.forEach(g => {
-                breakdown += `${g.label} ${g.status} (${g.winnersCount}/${g.needed}) Combos ${g.combosCount} Factor ${g.sumProducts.toFixed(2)} Return $${(g.sumProducts*stake).toFixed(2)}\n`;
+                breakdown += `${g.label} ${g.status} winners:${g.winnersCount} sizes:[${(g.allowed||[]).join(',')}] combos:${g.combosCount} factor:${g.sumProducts.toFixed(2)} return:$${(g.sumProducts*stake).toFixed(2)}\n`;
             });
             breakdown += `\nSystem Detail:\n` + breakdownLines.join('\n');
             document.getElementById('breakdown_content').textContent = breakdown;

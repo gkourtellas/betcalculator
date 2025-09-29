@@ -76,7 +76,7 @@
         </h1>
 
         <!-- Team Selection -->
-        <div class="mb-8" id="simple_team_section">
+        <div class="mb-8">
             <h2 class="text-xl font-semibold text-gray-700 mb-3">Number of Teams</h2>
             <div class="mb-4">
                 <select id="team_count" onchange="updateTeamCount()" class="px-4 py-3 border border-gray-300 rounded-lg text-lg shadow-sm w-full max-w-xs">
@@ -90,23 +90,8 @@
             </div>
         </div>
 
-        <!-- Betting Mode Selection -->
+        <!-- Custom System Selection -->
         <div class="mb-8">
-            <h2 class="text-xl font-semibold text-gray-700 mb-3">Betting Mode</h2>
-            <div class="grid grid-cols-2 gap-4">
-                <button id="simple_mode_btn" onclick="switchMode('simple')" class="p-4 bg-blue-500 text-white rounded-lg font-medium shadow-md hover:bg-blue-600 transition">
-                    Simple System Bets
-                    <div class="text-sm font-normal mt-1">Pick combinations from all teams</div>
-                </button>
-                <button id="group_mode_btn" onclick="switchMode('group')" class="p-4 bg-gray-200 text-gray-700 rounded-lg font-medium shadow-md hover:bg-gray-300 transition">
-                    Group System Bets
-                    <div class="text-sm font-normal mt-1">Create team groups with conditions</div>
-                </button>
-            </div>
-        </div>
-
-        <!-- Simple Mode: Custom System Selection -->
-        <div class="mb-8" id="simple_mode_section">
             <h2 class="text-xl font-semibold text-gray-700 mb-3">Select Your System</h2>
             <p class="text-sm text-gray-600 mb-4">Choose which combination sizes you want to include in your bet:</p>
             
@@ -137,52 +122,11 @@
             </div>
         </div>
 
-        <!-- Group Mode: Group-based System Selection -->
-        <div class="mb-8" id="group_mode_section" style="display: none;">
-            <h2 class="text-xl font-semibold text-gray-700 mb-3">Group System Configuration</h2>
-            
-            <div class="mb-4">
-                <div class="flex items-center gap-4 mb-4">
-                    <div>
-                        <label for="num_groups" class="block text-sm font-medium text-gray-700 mb-1">Number of Groups</label>
-                        <select id="num_groups" onchange="updateGroupConfiguration()" class="px-3 py-2 border border-gray-300 rounded-lg">
-                            <option value="2">2 Groups</option>
-                            <option value="3" selected>3 Groups</option>
-                            <option value="4">4 Groups</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="groups_required" class="block text-sm font-medium text-gray-700 mb-1">Groups Required to Win</label>
-                        <select id="groups_required" onchange="calculateGroupProfit()" class="px-3 py-2 border border-gray-300 rounded-lg">
-                            <option value="1">At least 1 group</option>
-                            <option value="2" selected>At least 2 groups</option>
-                            <option value="3">All 3 groups</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div id="group_configuration">
-                <!-- Group configurations will be populated by JavaScript -->
-            </div>
-
-            <div class="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                <div class="flex justify-between items-center text-sm">
-                    <span class="font-medium text-purple-800">Total Group Combinations:</span>
-                    <span id="group_bets_preview" class="font-bold text-purple-900">0</span>
-                </div>
-                <div class="flex justify-between items-center text-sm mt-1">
-                    <span class="font-medium text-purple-800">Total Stake:</span>
-                    <span id="group_stake_preview" class="font-bold text-purple-900">$0.00</span>
-                </div>
-            </div>
-        </div>
-
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <!-- Input Panel -->
-            <div class="lg:col-span-2" id="team_inputs_section">
+            <div class="lg:col-span-2">
                 <h2 class="text-xl font-semibold text-gray-700 mb-3">Bet Details</h2>
                 
                 <!-- Stake Input -->
@@ -367,8 +311,6 @@
     <script>
         let currentTeamCount = 3;
         let selectedSystems = new Set([2, 3]); // Default: doubles and trebles (like Trixie)
-        let currentMode = 'simple'; // 'simple' or 'group'
-        let groupConfiguration = []; // Store group configurations
 
         // Debounce utility to limit function calls
         let timeout;
@@ -532,11 +474,6 @@
         }
 
         function calculateProfit() {
-            if (currentMode === 'group') {
-                calculateGroupProfit();
-                return;
-            }
-            
             const stake = parseFloat(document.getElementById('unit_stake').value) || 0;
             
             if (selectedSystems.size === 0) {
@@ -645,222 +582,9 @@
             document.getElementById('breakdown_content').innerHTML = breakdownHtml;
         }
 
-        // Mode switching functions
-        function switchMode(mode) {
-            currentMode = mode;
-            
-            // Update button styles
-            document.getElementById('simple_mode_btn').className = mode === 'simple' 
-                ? 'p-4 bg-blue-500 text-white rounded-lg font-medium shadow-md hover:bg-blue-600 transition'
-                : 'p-4 bg-gray-200 text-gray-700 rounded-lg font-medium shadow-md hover:bg-gray-300 transition';
-                
-            document.getElementById('group_mode_btn').className = mode === 'group' 
-                ? 'p-4 bg-blue-500 text-white rounded-lg font-medium shadow-md hover:bg-blue-600 transition'
-                : 'p-4 bg-gray-200 text-gray-700 rounded-lg font-medium shadow-md hover:bg-gray-300 transition';
-            
-            // Show/hide sections
-            document.getElementById('simple_mode_section').style.display = mode === 'simple' ? 'block' : 'none';
-            document.getElementById('group_mode_section').style.display = mode === 'group' ? 'block' : 'none';
-            document.getElementById('simple_team_section').style.display = mode === 'simple' ? 'block' : 'none';
-            document.getElementById('team_inputs_section').style.display = mode === 'simple' ? 'block' : 'none';
-            
-            if (mode === 'group') {
-                updateGroupConfiguration();
-            } else {
-                updateTeamCount();
-            }
-        }
-
-        // Group mode functions
-        function updateGroupConfiguration() {
-            const numGroups = parseInt(document.getElementById('num_groups').value);
-            const container = document.getElementById('group_configuration');
-            container.innerHTML = '';
-            
-            // Update groups required dropdown
-            const groupsRequiredSelect = document.getElementById('groups_required');
-            groupsRequiredSelect.innerHTML = '';
-            for (let i = 1; i <= numGroups; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i === numGroups ? `All ${numGroups} groups` : `At least ${i} group${i > 1 ? 's' : ''}`;
-                if (i === Math.min(2, numGroups)) option.selected = true;
-                groupsRequiredSelect.appendChild(option);
-            }
-            
-            groupConfiguration = [];
-            
-            for (let i = 0; i < numGroups; i++) {
-                const groupDiv = document.createElement('div');
-                groupDiv.className = 'mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg';
-                
-                groupDiv.innerHTML = `
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Group ${String.fromCharCode(65 + i)}</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Teams in Group</label>
-                            <select id="group_${i}_teams" onchange="updateGroupTeams(${i})" class="px-3 py-2 border border-gray-300 rounded-lg w-full">
-                                <option value="2">2 Teams</option>
-                                <option value="3" selected>3 Teams</option>
-                                <option value="4">4 Teams</option>
-                                <option value="5">5 Teams</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Winners Required</label>
-                            <select id="group_${i}_required" onchange="calculateGroupProfit()" class="px-3 py-2 border border-gray-300 rounded-lg w-full">
-                                <option value="1">At least 1</option>
-                                <option value="2" selected>At least 2</option>
-                                <option value="3">All 3</option>
-                            </select>
-                        </div>
-                        <div class="flex items-end">
-                            <span class="text-sm font-medium text-green-600" id="group_${i}_combinations">3 combinations</span>
-                        </div>
-                    </div>
-                    <div id="group_${i}_teams_container" class="space-y-3">
-                        <!-- Team inputs will be added here -->
-                    </div>
-                `;
-                
-                container.appendChild(groupDiv);
-                groupConfiguration.push({ teams: 3, required: 2 });
-            }
-            
-            // Initialize all groups
-            for (let i = 0; i < numGroups; i++) {
-                updateGroupTeams(i);
-            }
-        }
-
-        function updateGroupTeams(groupIndex) {
-            const teamsInGroup = parseInt(document.getElementById(`group_${groupIndex}_teams`).value);
-            const container = document.getElementById(`group_${groupIndex}_teams_container`);
-            const requiredSelect = document.getElementById(`group_${groupIndex}_required`);
-            
-            // Update required winners dropdown
-            requiredSelect.innerHTML = '';
-            for (let i = 1; i <= teamsInGroup; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i === teamsInGroup ? `All ${teamsInGroup}` : `At least ${i}`;
-                if (i === Math.min(2, teamsInGroup)) option.selected = true;
-                requiredSelect.appendChild(option);
-            }
-            
-            // Update combinations display
-            const required = parseInt(requiredSelect.value);
-            let combinations = 0;
-            for (let r = required; r <= teamsInGroup; r++) {
-                combinations += nCr(teamsInGroup, r);
-            }
-            document.getElementById(`group_${groupIndex}_combinations`).textContent = `${combinations} combinations`;
-            
-            groupConfiguration[groupIndex] = { teams: teamsInGroup, required: required };
-            
-            // Regenerate ALL groups to update team numbering consistently
-            refreshAllGroupTeams();
-            calculateGroupProfit();
-        }
-
-        function refreshAllGroupTeams() {
-            const numGroups = parseInt(document.getElementById('num_groups').value);
-            
-            for (let groupIndex = 0; groupIndex < numGroups; groupIndex++) {
-                const teamsInGroup = parseInt(document.getElementById(`group_${groupIndex}_teams`).value);
-                const container = document.getElementById(`group_${groupIndex}_teams_container`);
-                
-                // Calculate starting team number for this group
-                let startingTeamNumber = 1;
-                for (let g = 0; g < groupIndex; g++) {
-                    const prevGroupTeams = parseInt(document.getElementById(`group_${g}_teams`).value);
-                    startingTeamNumber += prevGroupTeams;
-                }
-                
-                // Clear and regenerate team inputs
-                container.innerHTML = '';
-                for (let i = 0; i < teamsInGroup; i++) {
-                    const teamNumber = startingTeamNumber + i;
-                    const teamDiv = document.createElement('div');
-                    teamDiv.className = 'grid grid-cols-3 gap-4 items-center';
-                    teamDiv.innerHTML = `
-                        <span class="font-medium text-gray-700">Team ${teamNumber}</span>
-                        <input type="number" id="group_${groupIndex}_odds_${i}" value="1.50" min="1.01" step="0.01" 
-                               oninput="calculateGroupProfit()" class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
-                        <div class="flex justify-center">
-                            <label class="toggle-switch relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="group_${groupIndex}_win_${i}" checked onchange="calculateGroupProfit()" class="sr-only">
-                                <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
-                            </label>
-                        </div>
-                    `;
-                    container.appendChild(teamDiv);
-                }
-            }
-        }
-
-        function calculateGroupProfit() {
-            if (currentMode !== 'group') return;
-            
-            const stake = parseFloat(document.getElementById('unit_stake').value) || 0;
-            const numGroups = parseInt(document.getElementById('num_groups').value);
-            const groupsRequired = parseInt(document.getElementById('groups_required').value);
-            
-            // Calculate total possible group combinations
-            let totalGroupCombinations = 0;
-            for (let r = groupsRequired; r <= numGroups; r++) {
-                totalGroupCombinations += nCr(numGroups, r);
-            }
-            
-            // Calculate total individual bets
-            let totalBets = 0;
-            for (let i = 0; i < numGroups; i++) {
-                const teamsInGroup = parseInt(document.getElementById(`group_${i}_teams`).value);
-                const required = parseInt(document.getElementById(`group_${i}_required`).value);
-                let groupCombinations = 0;
-                for (let r = required; r <= teamsInGroup; r++) {
-                    groupCombinations += nCr(teamsInGroup, r);
-                }
-                totalBets = totalBets === 0 ? groupCombinations : totalBets * groupCombinations;
-            }
-            
-            totalBets *= totalGroupCombinations;
-            
-            document.getElementById('group_bets_preview').textContent = totalBets;
-            document.getElementById('group_stake_preview').textContent = `$${(stake * totalBets).toFixed(2)}`;
-            
-            if (stake <= 0) {
-                document.getElementById('total_bets').textContent = totalBets;
-                document.getElementById('total_stake_output').textContent = '$0.00';
-                document.getElementById('total_return_output').textContent = '$0.00';
-                document.getElementById('total_profit_output').textContent = '$0.00';
-                document.getElementById('breakdown_content').innerHTML = '<div class="text-gray-500 text-sm">Enter a stake to calculate profits</div>';
-                return;
-            }
-            
-            // For now, show a simplified calculation - this would need more complex logic for full implementation
-            let totalReturns = 0;
-            let breakdown = [];
-            
-            // This is a simplified version - full implementation would calculate all group combinations
-            document.getElementById('total_bets').textContent = totalBets;
-            document.getElementById('total_stake_output').textContent = `$${(stake * totalBets).toFixed(2)}`;
-            document.getElementById('total_return_output').textContent = `$${totalReturns.toFixed(2)}`;
-            
-            const profit = totalReturns - (stake * totalBets);
-            const profitOutput = document.getElementById('total_profit_output');
-            profitOutput.textContent = `$${profit.toFixed(2)}`;
-            profitOutput.classList.remove('text-green-500', 'text-red-500', 'text-gray-700');
-            if (profit > 0) profitOutput.classList.add('text-green-500');
-            else if (profit < 0) profitOutput.classList.add('text-red-500');
-            else profitOutput.classList.add('text-gray-700');
-            
-            document.getElementById('breakdown_content').innerHTML = '<div class="text-blue-600 text-sm">Group mode: Full calculation implementation in progress. Basic bet count and stake calculation shown above.</div>';
-        }
-
         // Initial setup when page loads
         window.onload = function() {
-            switchMode('simple');
+            updateTeamCount();
         };
     </script>
 </body>

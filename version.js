@@ -1,7 +1,7 @@
 // Global version management
 // Single source of truth for displayed version across all pages
 // Update APP_VERSION here ONLY, commit, and all pages will show new version.
-const APP_VERSION = '2.8';
+const APP_VERSION = '2.9';
 
 function applyVersion() {
   // Fill any element marked with data-app-version

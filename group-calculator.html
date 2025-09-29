@@ -81,25 +81,17 @@
         <div class="mb-8">
             <h2 class="text-xl font-semibold text-gray-700 mb-4">Configuration</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="group-system-types">
-                            <h3 class="text-sm font-semibold text-gray-700 mb-2">Group System Types (Optional)</h3>
-                            <p class="text-xs text-gray-500 mb-3">Select combinations of successful groups to include (e.g. Doubles + Trebles). If none selected, legacy "Groups Needed" logic is used.</p>
-                            <div id="group_system_types" class="flex flex-wrap gap-3"></div>
-                        </div>
+                <div class="group-system-types md:col-span-2">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-2">Group System Types</h3>
+                    <p class="text-xs text-gray-500 mb-3">Pick which group folds to bet (e.g. Doubles, Trebles). At least one is required.</p>
+                    <div id="group_system_types" class="flex flex-wrap gap-3"></div>
+                </div>
                 <div>
                     <label for="num_groups" class="block text-sm font-medium text-gray-700 mb-2">Number of Groups</label>
                     <select id="num_groups" onchange="updateConfiguration()" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                         <option value="2">2 Groups</option>
                         <option value="3" selected>3 Groups</option>
                         <option value="4">4 Groups</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="groups_required" class="block text-sm font-medium text-gray-700 mb-2">Groups Required to Win</label>
-                    <select id="groups_required" onchange="calculateProfit()" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                        <option value="1">At least 1</option>
-                        <option value="2" selected>At least 2</option>
-                        <option value="3">All 3</option>
                     </select>
                 </div>
                 <div>
@@ -165,8 +157,8 @@
     </div>
 
     <script>
-        let numGroups = 3;
-        let groupsData = [];
+    let numGroups = 3;
+    let groupsData = [];
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -175,19 +167,7 @@
 
         function updateConfiguration() {
             numGroups = parseInt(document.getElementById('num_groups').value);
-            
             buildGroupSystemTypeOptions();
-
-            // Update groups required dropdown
-            const groupsRequiredSelect = document.getElementById('groups_required');
-            groupsRequiredSelect.innerHTML = '';
-            for (let i = 1; i <= numGroups; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i === numGroups ? `All ${numGroups}` : `At least ${i}`;
-                if (i === Math.min(2, numGroups)) option.selected = true;
-                groupsRequiredSelect.appendChild(option);
-            }
             
             // Initialize groups data
             groupsData = [];
@@ -365,7 +345,6 @@
 
         function calculateProfit() {
             const stake = parseFloat(document.getElementById('unit_stake').value) || 0;
-            const groupsRequired = parseInt(document.getElementById('groups_required').value);
             const selectedGroupSizeElems = Array.from(document.querySelectorAll('.group-size-checkbox:checked'));
             const selectedGroupSizes = selectedGroupSizeElems.map(el => parseInt(el.value)).sort((a,b)=>a-b);
 
@@ -401,71 +380,65 @@
                 return { index: gi, status: 'OK', winnersCount: winnersIdx.length, needed, combosCount: winnerCombos.length, sumProducts, label: `Group ${String.fromCharCode(65+gi)}` };
             });
 
-            const successful = groupStats.filter(g => g.status==='OK');
-            const mode = selectedGroupSizes.length ? 'system' : 'threshold';
-
-            // Compute base total bets differently for system mode vs threshold
-            // For threshold mode: same as previous base (all theoretical tickets)
-            // For system mode: sum over each selected group size of all folds * product of required-size combination counts
-            let totalBetsPlaced = 0;
-            if (mode === 'threshold') {
-                totalBetsPlaced = baseTotalBets; // historical approach
-            } else {
-                // Build per-group required-size combination counts (static – before results)
-                const perGroupRequiredCombos = groupsData.map(g => nCr(g.teams, g.required));
-                selectedGroupSizes.forEach(size => {
-                    if (numGroups < size) return;
-                    const groupIndexArr = Array.from({length:numGroups}, (_,i)=>i);
-                    const folds = getCombinations(groupIndexArr, size);
-                    folds.forEach(fold => {
-                        let foldTickets = 1;
-                        fold.forEach(gIdx => { foldTickets *= perGroupRequiredCombos[gIdx]; });
-                        totalBetsPlaced += foldTickets;
-                    });
-                });
+            // Require at least one system type selection
+            if (!selectedGroupSizes.length) {
+                document.getElementById('total_bets').textContent = '0';
+                document.getElementById('total_stake').textContent = '$0.00';
+                document.getElementById('total_returns').textContent = '$0.00';
+                document.getElementById('net_profit').textContent = '$0.00';
+                document.getElementById('breakdown_content').textContent = 'Select at least one fold type (e.g. Doubles) to calculate.';
+                return;
             }
+
+            const successful = groupStats.filter(g => g.status==='OK');
+            const mode = 'system';
+
+            // Compute base total bets for system: sum over each selected group size of all folds * product of required-size combination counts
+            let totalBetsPlaced = 0;
+            const perGroupRequiredCombos = groupsData.map(g => nCr(g.teams, g.required));
+            selectedGroupSizes.forEach(size => {
+                if (numGroups < size) return;
+                const groupIndexArr = Array.from({length:numGroups}, (_,i)=>i);
+                const folds = getCombinations(groupIndexArr, size);
+                folds.forEach(fold => {
+                    let foldTickets = 1;
+                    fold.forEach(gIdx => { foldTickets *= perGroupRequiredCombos[gIdx]; });
+                    totalBetsPlaced += foldTickets;
+                });
+            });
 
             let totalReturns = 0;
             let winningBets = 0;
             let breakdownLines = [];
 
-            if (mode === 'threshold') {
-                if (successful.length >= groupsRequired) {
-                    totalReturns = successful.reduce((sum, g) => sum + g.sumProducts * stake, 0);
-                    // Winning bets approximation: product of required-size combos for successful groups only
-                    winningBets = successful.reduce((acc, g)=> acc * g.combosCount || 1, 1);
+            // System: only folds built from successful groups pay
+            const successIndices = successful.map(g => g.index);
+            selectedGroupSizes.forEach(size => {
+                if (successIndices.length < size) {
+                    breakdownLines.push(`${size}-Fold: not enough successful groups (${successIndices.length}/${size})`);
+                    return;
                 }
-                breakdownLines.push(`Mode: Threshold (need ${groupsRequired})`);
-            } else {
-                // System: only folds built from successful groups pay
-                const successIndices = successful.map(g => g.index);
-                selectedGroupSizes.forEach(size => {
-                    if (successIndices.length < size) {
-                        breakdownLines.push(`${size}-Fold: not enough successful groups (${successIndices.length}/${size})`);
-                        return;
-                    }
-                    const foldGroupCombos = getCombinations(successIndices, size);
-                    let foldWinningBets = 0;
-                    let foldReturnAccumulator = 0;
-                    foldGroupCombos.forEach(fold => {
-                        // Tickets for this fold that win = product of required-size winning combos per group
-                        let ticketsForFold = 1;
-                        let foldReturnFactor = 1; // product of sumProducts for groups in fold
-                        fold.forEach(gIdx => {
-                            const gs = groupStats[gIdx];
-                            ticketsForFold *= gs.combosCount; // required-size winning combos
-                            foldReturnFactor *= gs.sumProducts; // sum of products of odds for those combos
-                        });
-                        foldWinningBets += ticketsForFold;
-                        foldReturnAccumulator += foldReturnFactor;
+                const foldGroupCombos = getCombinations(successIndices, size);
+                let foldWinningBets = 0;
+                let foldReturnAccumulator = 0;
+                foldGroupCombos.forEach(fold => {
+                    // Tickets for this fold that win = product of required-size winning combos per group
+                    let ticketsForFold = 1;
+                    let foldReturnFactor = 1; // product of sumProducts for groups in fold
+                    fold.forEach(gIdx => {
+                        const gs = groupStats[gIdx];
+                        ticketsForFold *= gs.combosCount; // required-size winning combos
+                        foldReturnFactor *= gs.sumProducts; // sum of products of odds for those combos
                     });
-                    const foldReturnMoney = foldReturnAccumulator * stake;
-                    totalReturns += foldReturnMoney;
-                    winningBets += foldWinningBets;
-                    const label = size===2?'Doubles':(size===3?'Trebles':`${size}-Folds`);
-                    breakdownLines.push(`${label}: Fold Combos ${foldGroupCombos.length} Winning Bets ${foldWinningBets.toLocaleString()} Return $${foldReturnMoney.toFixed(2)}`);
+                    foldWinningBets += ticketsForFold;
+                    foldReturnAccumulator += foldReturnFactor;
                 });
-            }
+                const foldReturnMoney = foldReturnAccumulator * stake;
+                totalReturns += foldReturnMoney;
+                winningBets += foldWinningBets;
+                const label = size===2?'Doubles':(size===3?'Trebles':`${size}-Folds`);
+                breakdownLines.push(`${label}: Fold Combos ${foldGroupCombos.length} Winning Bets ${foldWinningBets.toLocaleString()} Return $${foldReturnMoney.toFixed(2)}`);
+            });
 
             const totalStake = stake * totalBetsPlaced;
             const netProfit = totalReturns - totalStake;
@@ -480,9 +453,8 @@
 
             // Breakdown
             let breakdown = '';
-            breakdown += `Mode: ${mode==='system'?'System Types':'Threshold'}\n`;
-            if (mode==='threshold') breakdown += `Min Groups Required: ${groupsRequired}\n`;
-            if (mode==='system') breakdown += `Selected Group Sizes: ${selectedGroupSizes.join(', ')}\n`;
+            breakdown += `Mode: System Types\n`;
+            breakdown += `Selected Group Sizes: ${selectedGroupSizes.join(', ')}\n`;
             breakdown += `Successful Groups: ${successful.length}/${numGroups}\n`;
             breakdown += `Total Bets Placed: ${totalBetsPlaced.toLocaleString()}  Stake: $${totalStake.toFixed(2)}\n`;
             breakdown += `Winning Bets: ${winningBets.toLocaleString()}  Losing Bets: ${(totalBetsPlaced - winningBets).toLocaleString()}\n`;

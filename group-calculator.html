@@ -28,9 +28,15 @@
             <h1 class="text-3xl font-extrabold text-gray-800">
                 Group System Betting Calculator
             </h1>
-            <a href="index.html" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition">
-                ← Back to Hub
-            </a>
+            <div class="flex gap-3">
+                <button onclick="calculateProfit()" 
+                        class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition">
+                    🔄 Recalculate
+                </button>
+                <a href="index.html" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition">
+                    ← Back to Hub
+                </a>
+            </div>
         </div>
 
         <!-- Configuration Section -->
@@ -59,6 +65,24 @@
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg" oninput="calculateProfit()">
                 </div>
             </div>
+        </div>
+
+        <!-- Default Odds Section -->
+        <div class="mb-8 bg-emerald-50 p-4 rounded-lg border border-emerald-200">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3">Quick Setup</h2>
+            <div class="flex gap-4 items-end">
+                <div class="flex-1">
+                    <label for="default_odds_group" class="block text-sm font-medium text-gray-700 mb-1">Default Odds (Copy to All Teams)</label>
+                    <input type="number" id="default_odds_group" value="1.50" min="1.01" step="0.01"
+                           class="w-full px-3 py-2 border border-emerald-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                           placeholder="e.g., 2.00">
+                </div>
+                <button onclick="copyDefaultOddsToAll()" 
+                        class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition">
+                    Copy to All Teams
+                </button>
+            </div>
+            <p class="text-xs text-emerald-600 mt-2">Enter odds here and click the button to set the same odds for all teams across all groups.</p>
         </div>
 
         <!-- Groups Section -->
@@ -337,6 +361,42 @@
             breakdownText += breakdown.join('\\n');
             
             document.getElementById('breakdown_content').textContent = breakdownText;
+        }
+
+        // Function to copy default odds to all teams across all groups
+        function copyDefaultOddsToAll() {
+            const defaultOdds = document.getElementById('default_odds_group').value;
+            if (!defaultOdds || defaultOdds < 1.01) {
+                alert('Please enter valid odds (1.01 or greater)');
+                return;
+            }
+            
+            const numGroups = parseInt(document.getElementById('num_groups').value);
+            let copiedCount = 0;
+            
+            // Copy to all visible team odds inputs across all groups
+            for (let groupIndex = 1; groupIndex <= numGroups; groupIndex++) {
+                for (let teamIndex = 1; teamIndex <= 3; teamIndex++) {
+                    const oddsInput = document.getElementById(`group${groupIndex}_odds${teamIndex}`);
+                    if (oddsInput && oddsInput.closest('.team-row').style.display !== 'none') {
+                        oddsInput.value = defaultOdds;
+                        copiedCount++;
+                    }
+                }
+            }
+            
+            // Recalculate after copying
+            calculateProfit();
+            
+            // Show confirmation
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = `✓ Copied to ${copiedCount} teams!`;
+            button.classList.add('bg-emerald-600');
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.classList.remove('bg-emerald-600');
+            }, 2000);
         }
     </script>
 </body>

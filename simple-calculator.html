@@ -13,12 +13,31 @@
             font-family: 'Inter', sans-serif;
             background-color: #f7f7f9;
         }
-        /* Custom checkbox style */
+        /* Custom toggle switch styles */
+        .toggle-switch .slider {
+            background-color: #ef4444; /* red-500 for LOSS */
+            border: 2px solid #dc2626; /* red-600 border */
+        }
         .toggle-switch input:checked + .slider {
-            background-color: #22c55e; /* green-500 */
+            background-color: #10b981; /* emerald-500 for WIN */
+            border: 2px solid #059669; /* emerald-600 border */
         }
         .toggle-switch input:checked + .slider::before {
             transform: translateX(1.5rem);
+        }
+        .toggle-switch .slider::before {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* WIN/LOSS label styles */
+        .text-green-600 {
+            color: #059669 !important;
+            font-weight: 700 !important;
+        }
+        .text-red-600 {
+            color: #dc2626 !important;
+            font-weight: 700 !important;
         }
         .bet-type-label {
             cursor: pointer;
@@ -181,7 +200,7 @@
                             <span id="win_label_1" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="win_1" checked onchange="updateToggleLabel(1); calculateProfit()" class="sr-only">
-                                <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
+                                <span class="slider w-10 h-6 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
                     </div>
@@ -195,7 +214,7 @@
                             <span id="win_label_2" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="win_2" checked onchange="updateToggleLabel(2); calculateProfit()" class="sr-only">
-                                <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
+                                <span class="slider w-10 h-6 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
                     </div>
@@ -209,7 +228,7 @@
                             <span id="win_label_3" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="win_3" checked onchange="updateToggleLabel(3); calculateProfit()" class="sr-only">
-                                <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
+                                <span class="slider w-10 h-6 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
                     </div>
@@ -223,7 +242,7 @@
                             <span id="win_label_4" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="win_4" checked onchange="updateToggleLabel(4); calculateProfit()" class="sr-only">
-                                <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
+                                <span class="slider w-10 h-6 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
                     </div>
@@ -237,7 +256,7 @@
                             <span id="win_label_5" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="win_5" checked onchange="updateToggleLabel(5); calculateProfit()" class="sr-only">
-                                <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
+                                <span class="slider w-10 h-6 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
                     </div>
@@ -251,7 +270,7 @@
                             <span id="win_label_6" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="win_6" checked onchange="updateToggleLabel(6); calculateProfit()" class="sr-only">
-                                <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
+                                <span class="slider w-10 h-6 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
                     </div>
@@ -265,7 +284,7 @@
                             <span id="win_label_7" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="win_7" checked onchange="updateToggleLabel(7); calculateProfit()" class="sr-only">
-                                <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
+                                <span class="slider w-10 h-6 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
                     </div>
@@ -279,7 +298,7 @@
                             <span id="win_label_8" class="text-xs font-medium text-green-600">WIN</span>
                             <label class="toggle-switch relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="win_8" checked onchange="updateToggleLabel(8); calculateProfit()" class="sr-only">
-                                <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
+                                <span class="slider w-10 h-6 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
                             </label>
                         </div>
                     </div>

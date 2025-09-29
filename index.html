@@ -725,10 +725,12 @@
                 
                 container.appendChild(groupDiv);
                 groupConfiguration.push({ teams: 3, required: 2 });
-                updateGroupTeams(i);
             }
             
-            calculateGroupProfit();
+            // Initialize all groups
+            for (let i = 0; i < numGroups; i++) {
+                updateGroupTeams(i);
+            }
         }
 
         function updateGroupTeams(groupIndex) {
@@ -754,29 +756,47 @@
             }
             document.getElementById(`group_${groupIndex}_combinations`).textContent = `${combinations} combinations`;
             
-            // Generate team inputs
-            container.innerHTML = '';
-            const letters = ['A', 'B', 'C', 'D', 'E'];
-            
-            for (let i = 0; i < teamsInGroup; i++) {
-                const teamDiv = document.createElement('div');
-                teamDiv.className = 'grid grid-cols-3 gap-4 items-center';
-                teamDiv.innerHTML = `
-                    <span class="font-medium text-gray-700">Team ${letters[i]}</span>
-                    <input type="number" id="group_${groupIndex}_odds_${i}" value="1.50" min="1.01" step="0.01" 
-                           oninput="calculateGroupProfit()" class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
-                    <div class="flex justify-center">
-                        <label class="toggle-switch relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="group_${groupIndex}_win_${i}" checked onchange="calculateGroupProfit()" class="sr-only">
-                            <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
-                        </label>
-                    </div>
-                `;
-                container.appendChild(teamDiv);
-            }
-            
             groupConfiguration[groupIndex] = { teams: teamsInGroup, required: required };
+            
+            // Regenerate ALL groups to update team numbering consistently
+            refreshAllGroupTeams();
             calculateGroupProfit();
+        }
+
+        function refreshAllGroupTeams() {
+            const numGroups = parseInt(document.getElementById('num_groups').value);
+            
+            for (let groupIndex = 0; groupIndex < numGroups; groupIndex++) {
+                const teamsInGroup = parseInt(document.getElementById(`group_${groupIndex}_teams`).value);
+                const container = document.getElementById(`group_${groupIndex}_teams_container`);
+                
+                // Calculate starting team number for this group
+                let startingTeamNumber = 1;
+                for (let g = 0; g < groupIndex; g++) {
+                    const prevGroupTeams = parseInt(document.getElementById(`group_${g}_teams`).value);
+                    startingTeamNumber += prevGroupTeams;
+                }
+                
+                // Clear and regenerate team inputs
+                container.innerHTML = '';
+                for (let i = 0; i < teamsInGroup; i++) {
+                    const teamNumber = startingTeamNumber + i;
+                    const teamDiv = document.createElement('div');
+                    teamDiv.className = 'grid grid-cols-3 gap-4 items-center';
+                    teamDiv.innerHTML = `
+                        <span class="font-medium text-gray-700">Team ${teamNumber}</span>
+                        <input type="number" id="group_${groupIndex}_odds_${i}" value="1.50" min="1.01" step="0.01" 
+                               oninput="calculateGroupProfit()" class="px-3 py-2 border border-gray-300 rounded-lg text-base shadow-sm">
+                        <div class="flex justify-center">
+                            <label class="toggle-switch relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="group_${groupIndex}_win_${i}" checked onchange="calculateGroupProfit()" class="sr-only">
+                                <span class="slider w-10 h-6 bg-red-500 rounded-full transition-colors duration-300 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-white before:w-5 before:h-5 before:rounded-full before:transition-transform before:duration-300"></span>
+                            </label>
+                        </div>
+                    `;
+                    container.appendChild(teamDiv);
+                }
+            }
         }
 
         function calculateGroupProfit() {

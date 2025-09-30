@@ -4,19 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Group System Betting Calculator v2.6</title>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="version.js"></script>
     <style>
-        /* Additional styles for group system types */
-        .group-system-types {
-            margin-top: 1rem;
-        }
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #10b981 0%, #065f46 100%);
-            min-height: 100vh;
-        }
+        /* Performance trim: remove external font, lighter background */
+        .group-system-types { margin-top: 1rem; }
+        body { font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; background: linear-gradient(135deg,#e8f8f2,#dfe8e5); min-height:100vh; }
+        /* Softer global card shadow */
+        .shadow-2xl { box-shadow: 0 4px 14px rgba(0,0,0,0.10) !important; }
         
         /* Custom toggle switch styles - FORCE OVERRIDE */
         .toggle-switch .slider {
